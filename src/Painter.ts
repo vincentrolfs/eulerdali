@@ -20,29 +20,34 @@ export class Painter {
   constructor(private readonly canvas: Canvas) {}
 
   paint() {
-    const { width, height, clear } = this.canvas;
+    const { width, height } = this.canvas;
 
-    this.canvas.clear();
+    this.canvas.startJob();
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         this.paintBlock(x, y);
       }
     }
+
+    this.canvas.endJob();
   }
 
   private paintBlock(x: number, y: number) {
     const color = this.computeColor(x, y);
-    this.canvas.rect(x, y, 1, 1, color);
+    this.canvas.pixel(x, y, color);
   }
 
-  private computeColor(xAbsolute: number, yAbsolute: number) {
+  private computeColor(
+    xAbsolute: number,
+    yAbsolute: number
+  ): [number, number, number] {
     const [x, y] = this.computeRelativeCoordinates(xAbsolute, yAbsolute);
     const red = Painter.computeColorComponent(x, y, func1);
     const green = Painter.computeColorComponent(x, y, func2);
     const blue = Painter.computeColorComponent(x, y, func3);
 
-    return `rgb(${red}, ${green}, ${blue})`;
+    return [red, green, blue];
   }
 
   private computeRelativeCoordinates(xAbsolute: number, yAbsolute: number) {
