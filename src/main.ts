@@ -12,6 +12,20 @@ class Main {
 
   run() {
     this.painter.paint();
+
+    document
+      .querySelectorAll("#fn-red, #fn-green, #fn-blue")
+      .forEach((el) =>
+        el.addEventListener("input", (x: Event) =>
+          this.onInputChange(x?.currentTarget as HTMLInputElement)
+        )
+      );
+  }
+
+  onInputChange(el: HTMLInputElement | undefined) {
+    if (!el || !el.id || !el.value) {
+      return;
+    }
   }
 }
 

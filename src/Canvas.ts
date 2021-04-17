@@ -7,10 +7,10 @@ export class Canvas {
 
   constructor() {
     this.element = document.getElementById("canvas") as HTMLCanvasElement;
-    this.element.width = Math.round(
+    this.element.width = Math.floor(
       document.body.clientWidth * CANVAS_WIDTH_RELATIVE
     );
-    this.element.height = Math.round(
+    this.element.height = Math.floor(
       document.body.clientHeight * CANVAS_HEIGHT_RELATIVE
     );
     this.ctx = this.element.getContext("2d")!;

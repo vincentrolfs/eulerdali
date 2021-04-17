@@ -3,14 +3,26 @@ html, body {
     padding: 0;
     width: 100vw;
     height: 100vh;
-    background: black;
+    overflow: hidden;
 }
 
-#canvas {
-    display: block;
-    margin: 0 auto;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-crisp-edges;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
+body {
+    display: flex;
+    flex-direction: column;
+
+    color: white;
+    background: black;
+    font-family: sans-serif;
+}
+
+#toolbar {
+    height: 90%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
 }
