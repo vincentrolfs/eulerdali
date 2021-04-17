@@ -11,13 +11,27 @@ export class Painter {
 
     this.canvas.startJob();
 
+    try {
+      this.paintAllBlocks(width, height, redFunc, greenFunc, blueFunc);
+    } catch {
+      this.canvas.abortJob();
+    }
+
+    this.canvas.endJob();
+  }
+
+  private paintAllBlocks(
+    width: number,
+    height: number,
+    redFunc: (x: number, y: number) => number,
+    greenFunc: (x: number, y: number) => number,
+    blueFunc: (x: number, y: number) => number
+  ) {
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         this.paintBlock(x, y, redFunc, greenFunc, blueFunc);
       }
     }
-
-    this.canvas.endJob();
   }
 
   private paintBlock(
@@ -28,7 +42,7 @@ export class Painter {
     blueFunc: ColorFunc
   ) {
     const color = this.computeColor(x, y, redFunc, greenFunc, blueFunc);
-    this.canvas.pixel(x, y, color);
+    this.canvas.setPixel(x, y, color);
   }
 
   private computeColor(
@@ -60,11 +74,12 @@ export class Painter {
   }
 
   private static getFuncResult(x: number, y: number, func: ColorFunc) {
-    try {
-      return func(x, y) || 0;
-    } catch {
-      return 0;
-    }
+    // try {
+    //   return func(x, y) || 0;
+    // } catch {
+    //   return 0;
+    // }
+    return func(x, y) || 0;
   }
 
   private static capNumber(num: number) {

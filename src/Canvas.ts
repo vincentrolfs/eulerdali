@@ -18,7 +18,7 @@ export class Canvas {
     this.ctx.fillRect(0, 0, this.element.width, this.element.height);
   }
 
-  pixel(
+  setPixel(
     x: number,
     y: number,
     color: [red: number, green: number, blue: number]
@@ -40,7 +40,6 @@ export class Canvas {
   }
 
   startJob() {
-    this.ctx.clearRect(0, 0, this.element.width, this.element.height);
     this.pendingImageData = this.ctx.getImageData(
       0,
       0,
@@ -49,9 +48,16 @@ export class Canvas {
     );
   }
 
+  abortJob() {
+    if (!this.pendingImageData) {
+      throw new Error("abortJob called, but no job has been started.");
+    }
+    this.pendingImageData = undefined;
+  }
+
   endJob() {
     if (!this.pendingImageData) {
-      throw new Error("No job has been started.");
+      throw new Error("endJob called, but no job has been started.");
     }
     this.ctx.putImageData(this.pendingImageData, 0, 0);
     this.pendingImageData = undefined;
