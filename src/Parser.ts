@@ -1,8 +1,10 @@
 import { Painter } from "./Painter";
 import { ColorFunc } from "./utilities";
+import { DEBOUNCE_TIMEOUT } from "./constants";
 
 export class Parser {
   private readonly inputs: NodeListOf<HTMLInputElement>;
+  private inputTimeout: number | undefined;
 
   constructor(private readonly painter: Painter) {
     this.inputs = document.querySelectorAll("#fn-red, #fn-green, #fn-blue");
@@ -28,11 +30,17 @@ export class Parser {
   }
 
   private onInputChange(el: HTMLInputElement | undefined) {
-    if (!el || !el.id || !el.value) {
-      return;
+    if (this.inputTimeout !== undefined) {
+      clearTimeout(this.inputTimeout);
     }
 
-    this.paint();
+    this.inputTimeout = setTimeout(() => {
+      if (!el || !el.id || !el.value) {
+        return;
+      }
+
+      this.paint();
+    }, DEBOUNCE_TIMEOUT);
   }
 
   private paint() {
