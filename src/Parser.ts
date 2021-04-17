@@ -9,12 +9,22 @@ export class Parser {
   }
 
   parse() {
+    this.registerGlobalMath();
     this.inputs.forEach((el) =>
       el.addEventListener("input", (x) =>
         this.onInputChange(x?.currentTarget as HTMLInputElement)
       )
     );
     this.paint();
+  }
+
+  registerGlobalMath() {
+    for (const key of Object.getOwnPropertyNames(Math)) {
+      if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
+        // @ts-ignore
+        window[key] = Math[key];
+      }
+    }
   }
 
   private onInputChange(el: HTMLInputElement | undefined) {
