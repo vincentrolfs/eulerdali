@@ -1,31 +1,20 @@
 import { Canvas } from "./Canvas";
 import { Painter } from "./Painter";
+import { Parser } from "./Parser";
 
 class Main {
   private readonly canvas: Canvas;
   private readonly painter: Painter;
+  private readonly parser: Parser;
 
   constructor() {
     this.canvas = new Canvas();
     this.painter = new Painter(this.canvas);
+    this.parser = new Parser(this.painter);
   }
 
   run() {
-    this.painter.paint();
-
-    document
-      .querySelectorAll("#fn-red, #fn-green, #fn-blue")
-      .forEach((el) =>
-        el.addEventListener("input", (x: Event) =>
-          this.onInputChange(x?.currentTarget as HTMLInputElement)
-        )
-      );
-  }
-
-  onInputChange(el: HTMLInputElement | undefined) {
-    if (!el || !el.id || !el.value) {
-      return;
-    }
+    this.parser.parse();
   }
 }
 
