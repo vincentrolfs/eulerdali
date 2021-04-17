@@ -1,7 +1,7 @@
 import { Canvas } from "./Canvas";
 import { ColorFunc } from "./utilities";
 
-const zoom = 1 / 4;
+const zoom = 1;
 
 export class Painter {
   constructor(private readonly canvas: Canvas) {}
@@ -74,11 +74,6 @@ export class Painter {
   }
 
   private static getFuncResult(x: number, y: number, func: ColorFunc) {
-    // try {
-    //   return func(x, y) || 0;
-    // } catch {
-    //   return 0;
-    // }
     return func(x, y) || 0;
   }
 
