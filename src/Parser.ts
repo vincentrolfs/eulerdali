@@ -1,11 +1,13 @@
 import { Painter } from "./Painter";
 import { ColorFunc, PaintInputs, ZoomFunc } from "./utilities";
 import { DEBOUNCE_TIMEOUT } from "./constants";
+import { examples, initialExample } from "./examples";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
 const INPUT_ID_BLUE = "#input-blue";
 const INPUT_ID_ZOOM = "#input-zoom";
+const BUTTON_ID_RANDOM = "#button-random";
 
 type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
 
@@ -23,16 +25,24 @@ export class Parser {
   }
 
   parse() {
-    this.registerGlobalMath();
+    Parser.registerGlobalMath();
+    this.setEventListeners();
+    this.setExample(initialExample);
+  }
+
+  private setEventListeners() {
     Object.values(this.inputs).forEach((el) =>
       el.addEventListener("input", (x) =>
         this.onInputChange(x.currentTarget as HTMLInputElement | null)
       )
     );
-    this.paint();
+
+    document
+      .querySelector(BUTTON_ID_RANDOM)!
+      .addEventListener("click", () => this.setExample());
   }
 
-  registerGlobalMath() {
+  private static registerGlobalMath() {
     for (const key of Object.getOwnPropertyNames(Math)) {
       if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
         // @ts-ignore
@@ -53,6 +63,25 @@ export class Parser {
 
       this.paint();
     }, DEBOUNCE_TIMEOUT);
+  }
+
+  private setExample(index?: number) {
+    if (index === undefined) {
+      index = Math.floor(Math.random() * examples.length);
+    }
+    const example = examples[index];
+    let somethingChanged = false;
+
+    for (const key of Object.keys(example) as (keyof PaintInputs)[]) {
+      somethingChanged ||= this.inputs[key].value !== example[key];
+      this.inputs[key].value = example[key];
+    }
+
+    if (somethingChanged || index !== undefined) {
+      this.paint();
+    } else {
+      this.setExample();
+    }
   }
 
   private paint() {
