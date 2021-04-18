@@ -1,4 +1,11 @@
 export type ColorFunc = (x: number, y: number) => number;
+export type ZoomFunc = () => number;
+export type PaintInputs = {
+  red: ColorFunc;
+  green: ColorFunc;
+  blue: ColorFunc;
+  zoom: ZoomFunc;
+};
 
 // (x*y % 2)/2, (x*y % 3)/3, (x*y % 5)/5, 1/7
 // sin(1 / log(cos(x) + 1 / tan(y))), cos(1 / log(tan(x) + 1 / sin(y))), tan(1 / log(sin(x) + 1 / cos(y))), 1/4

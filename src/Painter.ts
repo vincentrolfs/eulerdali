@@ -1,19 +1,18 @@
 import { Canvas } from "./Canvas";
-import { ColorFunc } from "./utilities";
-
-const zoom = 1;
+import { ColorFunc, PaintInputs, ZoomFunc } from "./utilities";
 
 export class Painter {
   constructor(private readonly canvas: Canvas) {}
 
-  paint(redFunc: ColorFunc, greenFunc: ColorFunc, blueFunc: ColorFunc) {
+  paint(paintInputs: PaintInputs) {
     const { width, height } = this.canvas;
 
     this.canvas.startJob();
 
     try {
-      this.paintAllBlocks(width, height, redFunc, greenFunc, blueFunc);
-    } catch {
+      this.paintAllBlocks(width, height, paintInputs);
+    } catch (e) {
+      console.log(e);
       this.canvas.abortJob();
     }
 
@@ -23,45 +22,43 @@ export class Painter {
   private paintAllBlocks(
     width: number,
     height: number,
-    redFunc: (x: number, y: number) => number,
-    greenFunc: (x: number, y: number) => number,
-    blueFunc: (x: number, y: number) => number
+    paintInputs: PaintInputs
   ) {
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        this.paintBlock(x, y, redFunc, greenFunc, blueFunc);
+        this.paintBlock(x, y, paintInputs);
       }
     }
   }
 
-  private paintBlock(
-    x: number,
-    y: number,
-    redFunc: ColorFunc,
-    greenFunc: ColorFunc,
-    blueFunc: ColorFunc
-  ) {
-    const color = this.computeColor(x, y, redFunc, greenFunc, blueFunc);
+  private paintBlock(x: number, y: number, paintInputs: PaintInputs) {
+    const color = this.computeColor(x, y, paintInputs);
     this.canvas.setPixel(x, y, color);
   }
 
   private computeColor(
     xAbsolute: number,
     yAbsolute: number,
-    redFunc: ColorFunc,
-    greenFunc: ColorFunc,
-    blueFunc: ColorFunc
+    paintInputs: PaintInputs
   ): [number, number, number] {
-    const [x, y] = this.computeRelativeCoordinates(xAbsolute, yAbsolute);
-    const red = Painter.computeColorComponent(x, y, redFunc);
-    const green = Painter.computeColorComponent(x, y, greenFunc);
-    const blue = Painter.computeColorComponent(x, y, blueFunc);
+    const [x, y] = this.computeRelativeCoordinates(
+      xAbsolute,
+      yAbsolute,
+      paintInputs.zoom
+    );
+    const red = Painter.computeColorComponent(x, y, paintInputs.red);
+    const green = Painter.computeColorComponent(x, y, paintInputs.green);
+    const blue = Painter.computeColorComponent(x, y, paintInputs.blue);
 
     return [red, green, blue];
   }
 
-  private computeRelativeCoordinates(xAbsolute: number, yAbsolute: number) {
-    const scale = zoom * Math.min(this.canvas.width, this.canvas.height);
+  private computeRelativeCoordinates(
+    xAbsolute: number,
+    yAbsolute: number,
+    zoom: ZoomFunc
+  ) {
+    const scale = zoom() * Math.min(this.canvas.width, this.canvas.height);
 
     return [
       (2 * xAbsolute - this.canvas.width) / scale,

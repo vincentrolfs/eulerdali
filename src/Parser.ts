@@ -1,20 +1,32 @@
 import { Painter } from "./Painter";
-import { ColorFunc } from "./utilities";
+import { ColorFunc, PaintInputs, ZoomFunc } from "./utilities";
 import { DEBOUNCE_TIMEOUT } from "./constants";
 
+const INPUT_ID_RED = "#input-red";
+const INPUT_ID_GREEN = "#input-green";
+const INPUT_ID_BLUE = "#input-blue";
+const INPUT_ID_ZOOM = "#input-zoom";
+
+type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
+
 export class Parser {
-  private readonly inputs: NodeListOf<HTMLInputElement>;
+  private readonly inputs: InputMap;
   private inputTimeout: number | undefined;
 
   constructor(private readonly painter: Painter) {
-    this.inputs = document.querySelectorAll("#fn-red, #fn-green, #fn-blue");
+    this.inputs = {
+      red: document.querySelector(INPUT_ID_RED)!,
+      green: document.querySelector(INPUT_ID_GREEN)!,
+      blue: document.querySelector(INPUT_ID_BLUE)!,
+      zoom: document.querySelector(INPUT_ID_ZOOM)!,
+    };
   }
 
   parse() {
     this.registerGlobalMath();
-    this.inputs.forEach((el) =>
+    Object.values(this.inputs).forEach((el) =>
       el.addEventListener("input", (x) =>
-        this.onInputChange(x?.currentTarget as HTMLInputElement)
+        this.onInputChange(x.currentTarget as HTMLInputElement | null)
       )
     );
     this.paint();
@@ -29,7 +41,7 @@ export class Parser {
     }
   }
 
-  private onInputChange(el: HTMLInputElement | undefined) {
+  private onInputChange(el: HTMLInputElement | null) {
     if (this.inputTimeout !== undefined) {
       clearTimeout(this.inputTimeout);
     }
@@ -44,20 +56,33 @@ export class Parser {
   }
 
   private paint() {
+    let paintInputs;
+
     try {
-      const [redFunc, greenFunc, blueFunc] = this.buildAllFuncs();
-      this.painter.paint(redFunc, greenFunc, blueFunc);
-    } catch {}
+      paintInputs = this.buildPaintInputs();
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (paintInputs) {
+      this.painter.paint(paintInputs);
+    }
   }
 
-  private buildAllFuncs() {
-    const funcs: ColorFunc[] = [];
-    this.inputs.forEach((el) => funcs.push(Parser.buildFunc(el.value)));
-
-    return funcs;
+  private buildPaintInputs(): PaintInputs {
+    return {
+      red: Parser.buildColorFunc(this.inputs.red.value),
+      green: Parser.buildColorFunc(this.inputs.green.value),
+      blue: Parser.buildColorFunc(this.inputs.blue.value),
+      zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
+    };
   }
 
-  private static buildFunc(funcDescription: string): ColorFunc {
+  private static buildColorFunc(funcDescription: string): ColorFunc {
     return new Function("x", "y", `return ${funcDescription};`) as ColorFunc;
+  }
+
+  private static buildZoomFunc(funcDescription: string): ZoomFunc {
+    return new Function(`return ${funcDescription};`) as ZoomFunc;
   }
 }
