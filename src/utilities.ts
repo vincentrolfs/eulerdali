@@ -5,3 +5,4 @@ export type ColorFunc = (x: number, y: number) => number;
 // sin(sqrt(abs(x+y))), sin(x/y), sin(pow(abs(y), abs(x)) + pow(abs(x), abs(y))), 1/10
 // x, y, x+y, 1
 // ((y-cosh(x*3)) - 0.1)% 1, y/3, y/2, 1
+// max(x,y), x+y, x*y, 1
