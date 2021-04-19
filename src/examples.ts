@@ -1,7 +1,7 @@
 import { PaintInputs } from "./utilities";
 
 export type Example = Record<keyof PaintInputs, string>;
-export const initialExample = 0;
+export const initialExample = 11;
 export const examples: Example[] = [
   {
     red: "x",
@@ -46,5 +46,35 @@ export const examples: Example[] = [
     blue:
       "(r = sqrt(x**2 + y**2)) && (r*cos(4*r) - x)**2 + (r*sin(4*r) - y)**2",
     zoom: "1/7",
+  },
+  {
+    red: "1/(y+x**3)",
+    green: "1/(1+x**2)",
+    blue: "1/(1+x**2)",
+    zoom: "1/6",
+  },
+  {
+    red: "1.7/(x**2 + y**2)",
+    green: ".25/(x*y - (x**2)*y + x**3 - y)",
+    blue: "1/(1.5*(y**2)*x - 1.5*x**2)",
+    zoom: "1/6",
+  },
+  {
+    red: "0.01/(((x-8)*y % 2)/2)",
+    green: "0.01/(((x-8)*y % 3)/3)",
+    blue: "0.01/(((x-8)*y % 3)/3)",
+    zoom: "1/5",
+  },
+  {
+    red: "1/(sin(x**2 + y**2) + 2*cos(x*y))",
+    green: "1/(sin(x**2 + (y+PI)**2) - 3*cos(x*y))",
+    blue: "1/(sin(x**2 + (y-PI)**2) - 1*cos(x*y))",
+    zoom: "1/6",
+  },
+  {
+    red: "(x-1) % y",
+    green: "x % y",
+    blue: "(x+1) % y",
+    zoom: "1/2",
   },
 ];
