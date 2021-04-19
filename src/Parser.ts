@@ -66,18 +66,20 @@ export class Parser {
   }
 
   private setExample(index?: number) {
-    if (index === undefined) {
+    const randomMode = index === undefined;
+    if (randomMode) {
       index = Math.floor(Math.random() * examples.length);
     }
-    const example = examples[index];
+    const example = examples[index!];
     let somethingChanged = false;
 
     for (const key of Object.keys(example) as (keyof PaintInputs)[]) {
-      somethingChanged ||= this.inputs[key].value !== example[key];
+      somethingChanged =
+        somethingChanged || this.inputs[key].value !== example[key];
       this.inputs[key].value = example[key];
     }
 
-    if (somethingChanged || index !== undefined) {
+    if (somethingChanged || !randomMode) {
       this.paint();
     } else {
       this.setExample();
