@@ -1,7 +1,7 @@
 # Eulerdali
 
 <p align="center">
-  <img width="460" height="201" src="cover.png" alt="Eulerdali example image">
+  <img width="600" height="263" src="cover.png" alt="Eulerdali example image">
 </p>
 
 Create beautiful images using math equations.
