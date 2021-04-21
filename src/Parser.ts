@@ -1,7 +1,8 @@
 import { Painter } from "./Painter";
-import { ColorFunc, PaintInputs, ZoomFunc } from "./utilities";
+import { ColorFunc, PaintInputNames, PaintInputs, ZoomFunc } from "./utilities";
 import { DEBOUNCE_TIMEOUT } from "./constants";
-import { examples, initialExample } from "./examples";
+import { examples } from "./examples";
+import { Randomizer } from "./Randomizer";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
@@ -14,6 +15,7 @@ type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
 export class Parser {
   private readonly inputs: InputMap;
   private inputTimeout: number | undefined;
+  private readonly randomizer: Randomizer;
 
   constructor(private readonly painter: Painter) {
     this.inputs = {
@@ -22,12 +24,14 @@ export class Parser {
       blue: document.querySelector(INPUT_ID_BLUE)!,
       zoom: document.querySelector(INPUT_ID_ZOOM)!,
     };
+
+    this.randomizer = new Randomizer();
   }
 
   parse() {
     Parser.registerGlobalMath();
     this.setEventListeners();
-    this.setExample(initialExample);
+    this.setRandom();
   }
 
   private setEventListeners() {
@@ -39,7 +43,7 @@ export class Parser {
 
     document
       .querySelector(BUTTON_ID_RANDOM)!
-      .addEventListener("click", () => this.setExample());
+      .addEventListener("click", () => this.setRandom());
   }
 
   private static registerGlobalMath() {
@@ -65,6 +69,17 @@ export class Parser {
     }, DEBOUNCE_TIMEOUT);
   }
 
+  private setRandom() {
+    for (const key of PaintInputNames) {
+      this.inputs[key].value =
+        key === "zoom"
+          ? this.randomizer.randomZoom()
+          : this.randomizer.randomFunc();
+    }
+
+    this.paint();
+  }
+
   private setExample(index?: number) {
     const randomMode = index === undefined;
     if (randomMode) {
@@ -73,7 +88,7 @@ export class Parser {
     const example = examples[index!];
     let somethingChanged = false;
 
-    for (const key of Object.keys(example) as (keyof PaintInputs)[]) {
+    for (const key of PaintInputNames) {
       somethingChanged =
         somethingChanged || this.inputs[key].value !== example[key];
       this.inputs[key].value = example[key];

@@ -12,10 +12,11 @@
     define("constants", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.DEBOUNCE_TIMEOUT = exports.CANVAS_HEIGHT_RELATIVE = exports.CANVAS_WIDTH_RELATIVE = void 0;
+        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.CANVAS_HEIGHT_RELATIVE = exports.CANVAS_WIDTH_RELATIVE = void 0;
         exports.CANVAS_WIDTH_RELATIVE = 1;
         exports.CANVAS_HEIGHT_RELATIVE = 0.9;
         exports.DEBOUNCE_TIMEOUT = 300;
+        exports.RANDOMIZER_MAX_DEPTH = 5;
     });
     define("Canvas", ["require", "exports", "constants"], function (require, exports, constants_1) {
         "use strict";
@@ -80,6 +81,9 @@
     define("utilities", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
+        exports.PaintInputNames = void 0;
+        exports.PaintInputNames = ["red", "green", "blue", "zoom"];
+        var __ensure_subtype = function (x) { return x; };
     });
     define("Painter", ["require", "exports"], function (require, exports) {
         "use strict";
@@ -219,7 +223,95 @@
             },
         ];
     });
-    define("Parser", ["require", "exports", "constants", "examples"], function (require, exports, constants_2, examples_1) {
+    define("Randomizer", ["require", "exports", "constants"], function (require, exports, constants_2) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.Randomizer = void 0;
+        var NULLARY_OPERATIONS = [
+            function () { return "x"; },
+            function () { return "y"; },
+            function (n) { return n.toString(); },
+        ];
+        var UNARY_OPERATIONS = [
+            function (s) { return s; },
+            function (s) { return "exp(" + s + ")"; },
+            function (s) { return "sin(" + s + ")"; },
+            function (s) { return "cos(" + s + ")"; },
+            function (s) { return "tan(" + s + ")"; },
+            function (s) { return "sinh(" + s + ")"; },
+            function (s) { return "cosh(" + s + ")"; },
+            function (s) { return "tanh(" + s + ")"; },
+            function (s) { return "abs(" + s + ")"; },
+            function (s) { return "log(" + s + ")"; },
+            function (s) { return "log(abs(" + s + "))"; },
+            function (s) { return "sqrt(" + s + ")"; },
+            function (s) { return "sqrt(abs(" + s + "))"; },
+            function (s) { return "1/(" + s + ")"; },
+            function (s) { return "(" + s + ")**2"; },
+            function (s) { return "(" + s + ")**3"; },
+            // (s) => `(${s})**4`,
+            // (s) => `(${s})**5`,
+            // (s) => `floor(${s})`,
+            // (s) => `round(${s})`,
+            // (s) => `sign(${s})`,
+        ];
+        var BINARY_OPERATIONS = [
+            function (s, t) { return "(" + s + ")+(" + t + ")"; },
+            function (s, t) { return "(" + s + ")*(" + t + ")"; },
+            function (s, t) { return "(" + s + ")-(" + t + ")"; },
+            function (s, t) { return "(" + s + ")/(" + t + ")"; },
+            // (s, t) => `pow(${s},${t})`,
+            // (s, t) => `max(${s},${t})`,
+            // (s, t) => `min(${s},${t})`,
+        ];
+        var Randomizer = /** @class */ (function () {
+            function Randomizer() {
+            }
+            Randomizer.prototype.randomFunc = function () {
+                return this.createSubFunc(1);
+            };
+            Randomizer.prototype.randomZoom = function () {
+                return "1/" + this.randInt(1, 10);
+            };
+            Randomizer.prototype.createSubFunc = function (currentDepth) {
+                var arity = this.randInt(0, 2);
+                if (constants_2.RANDOMIZER_MAX_DEPTH === currentDepth || arity === 0) {
+                    return this.nullaryOperation();
+                }
+                else if (arity === 1) {
+                    return this.unaryOperation(this.createSubFunc(currentDepth + 1));
+                }
+                else {
+                    return this.binaryOperation(this.createSubFunc(currentDepth + 1), this.createSubFunc(currentDepth + 1));
+                }
+            };
+            Randomizer.prototype.nullaryOperation = function () {
+                var n = this.randInt(-5, 5);
+                var operation = this.sample(NULLARY_OPERATIONS);
+                return operation(n);
+            };
+            Randomizer.prototype.unaryOperation = function (s) {
+                var operation = this.sample(UNARY_OPERATIONS);
+                return operation(s);
+            };
+            Randomizer.prototype.binaryOperation = function (s, t) {
+                var operation = this.sample(BINARY_OPERATIONS);
+                return operation(s, t);
+            };
+            Randomizer.prototype.sample = function (array) {
+                return array[this.randInt(0, array.length - 1)];
+            };
+            Randomizer.prototype.randInt = function (minInclusive, maxInclusive) {
+                return Math.round(this.randFloat(minInclusive, maxInclusive));
+            };
+            Randomizer.prototype.randFloat = function (minInclusive, maxInclusive) {
+                return (maxInclusive - minInclusive) * Math.random() + minInclusive;
+            };
+            return Randomizer;
+        }());
+        exports.Randomizer = Randomizer;
+    });
+    define("Parser", ["require", "exports", "utilities", "constants", "examples", "Randomizer"], function (require, exports, utilities_1, constants_3, examples_1, Randomizer_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Parser = void 0;
@@ -237,11 +329,12 @@
                     blue: document.querySelector(INPUT_ID_BLUE),
                     zoom: document.querySelector(INPUT_ID_ZOOM),
                 };
+                this.randomizer = new Randomizer_1.Randomizer();
             }
             Parser.prototype.parse = function () {
                 Parser.registerGlobalMath();
                 this.setEventListeners();
-                this.setExample(examples_1.initialExample);
+                this.setRandom();
             };
             Parser.prototype.setEventListeners = function () {
                 var _this = this;
@@ -252,7 +345,7 @@
                 });
                 document
                     .querySelector(BUTTON_ID_RANDOM)
-                    .addEventListener("click", function () { return _this.setExample(); });
+                    .addEventListener("click", function () { return _this.setRandom(); });
             };
             Parser.registerGlobalMath = function () {
                 for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
@@ -273,7 +366,17 @@
                         return;
                     }
                     _this.paint();
-                }, constants_2.DEBOUNCE_TIMEOUT);
+                }, constants_3.DEBOUNCE_TIMEOUT);
+            };
+            Parser.prototype.setRandom = function () {
+                for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
+                    var key = PaintInputNames_1[_i];
+                    this.inputs[key].value =
+                        key === "zoom"
+                            ? this.randomizer.randomZoom()
+                            : this.randomizer.randomFunc();
+                }
+                this.paint();
             };
             Parser.prototype.setExample = function (index) {
                 var randomMode = index === undefined;
@@ -282,8 +385,8 @@
                 }
                 var example = examples_1.examples[index];
                 var somethingChanged = false;
-                for (var _i = 0, _a = Object.keys(example); _i < _a.length; _i++) {
-                    var key = _a[_i];
+                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
+                    var key = PaintInputNames_2[_i];
                     somethingChanged =
                         somethingChanged || this.inputs[key].value !== example[key];
                     this.inputs[key].value = example[key];
