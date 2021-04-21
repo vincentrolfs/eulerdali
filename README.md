@@ -4,7 +4,9 @@
   <img width="600" height="263" src="cover.png" alt="Eulerdali example image">
 </p>
 
-Create beautiful images using math equations.
+<p align="center">
+  Create beautiful images using math equations.
+</p>
 
 ## Why?
 I wanted to explore the relationship between mathematical formulas and art.
