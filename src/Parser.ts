@@ -1,7 +1,7 @@
 import { Painter } from "./Painter";
 import { ColorFunc, PaintInputNames, PaintInputs, ZoomFunc } from "./utilities";
 import { DEBOUNCE_TIMEOUT } from "./constants";
-import { examples } from "./examples";
+import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
 
 const INPUT_ID_RED = "#input-red";
@@ -31,7 +31,7 @@ export class Parser {
   parse() {
     Parser.registerGlobalMath();
     this.setEventListeners();
-    this.setRandom();
+    this.setExample(initialExample);
   }
 
   private setEventListeners() {

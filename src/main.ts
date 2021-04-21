@@ -18,4 +18,4 @@ class Main {
   }
 }
 
-new Main().run();
+window.onload = () => new Main().run();

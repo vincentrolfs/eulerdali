@@ -27,6 +27,9 @@
                 this.element = document.getElementById(constants_1.CANVAS_ID);
                 this.element.width = document.body.clientWidth;
                 var toolbarHeight = document.getElementById(constants_1.TOOLBAR_ID).clientHeight;
+                console.log(toolbarHeight);
+                console.log(document.body.clientHeight - toolbarHeight);
+                console.log(document.body.clientHeight);
                 this.element.height = document.body.clientHeight - toolbarHeight;
                 this.ctx = this.element.getContext("2d");
                 this.ctx.fillRect(0, 0, this.element.width, this.element.height);
@@ -148,19 +151,19 @@
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.examples = exports.initialExample = void 0;
-        exports.initialExample = 11;
+        exports.initialExample = 0;
         exports.examples = [
-            {
-                red: "x",
-                green: "y",
-                blue: "x+y",
-                zoom: "1",
-            },
             {
                 red: "sin(1 / log(cos(x) + 1 / tan(y)))",
                 green: "cos(1 / log(tan(x) + 1 / sin(y)))",
                 blue: "tan(1 / log(sin(x) + 1 / cos(y)))",
                 zoom: "1/4",
+            },
+            {
+                red: "x",
+                green: "y",
+                blue: "x+y",
+                zoom: "1",
             },
             {
                 red: "(x*y % 2)/2",
@@ -335,7 +338,7 @@
             Parser.prototype.parse = function () {
                 Parser.registerGlobalMath();
                 this.setEventListeners();
-                this.setRandom();
+                this.setExample(examples_1.initialExample);
             };
             Parser.prototype.setEventListeners = function () {
                 var _this = this;
@@ -443,7 +446,7 @@
             };
             return Main;
         }());
-        new Main().run();
+        window.onload = function () { return new Main().run(); };
     });
     //# sourceMappingURL=main.js.map
     'marker:resolver';

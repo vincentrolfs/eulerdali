@@ -1,19 +1,19 @@
 import { PaintInputs } from "./utilities";
 
 export type Example = Record<keyof PaintInputs, string>;
-export const initialExample = 11;
+export const initialExample = 0;
 export const examples: Example[] = [
-  {
-    red: "x",
-    green: "y",
-    blue: "x+y",
-    zoom: "1",
-  },
   {
     red: "sin(1 / log(cos(x) + 1 / tan(y)))",
     green: "cos(1 / log(tan(x) + 1 / sin(y)))",
     blue: "tan(1 / log(sin(x) + 1 / cos(y)))",
     zoom: "1/4",
+  },
+  {
+    red: "x",
+    green: "y",
+    blue: "x+y",
+    zoom: "1",
   },
   {
     red: "(x*y % 2)/2",

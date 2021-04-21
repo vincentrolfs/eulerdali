@@ -10,6 +10,9 @@ export class Canvas {
     this.element.width = document.body.clientWidth;
 
     const toolbarHeight = document.getElementById(TOOLBAR_ID)!.clientHeight;
+    console.log(toolbarHeight);
+    console.log(document.body.clientHeight - toolbarHeight);
+    console.log(document.body.clientHeight);
     this.element.height = document.body.clientHeight - toolbarHeight;
 
     this.ctx = this.element.getContext("2d")!;
