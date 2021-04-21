@@ -1,7 +1,9 @@
 # Eulerdali
 
 <p align="center">
-  <img width="600" height="263" src="cover.png" alt="Eulerdali example image">
+  <a href="https://vincentrolfs.github.io/eulerdali/">
+    <img width="600" height="263" src="cover.png" alt="Eulerdali example image">
+  </a>
 </p>
 
 <p align="center">
@@ -12,7 +14,7 @@
 I wanted to explore the relationship between mathematical formulas and art.
 
 ## What?
-Eulerdali enables you to input mathematical formulas to visualize them. You can input separate formulas for the Red, Green and Blue color channel. The formulas take the `x` and `y` coordinates as input and output a number.
+[Eulerdali](https://vincentrolfs.github.io/eulerdali/) enables you to input mathematical formulas to visualize them. You can input separate formulas for the Red, Green and Blue color channel. The formulas take the `x` and `y` coordinates as input and output a number.
 
 The sign of the output is ignored. An output of `1` or higher corresponds to maximum brightness. You can use all the functions from the [JavaScript `Math` object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math).
 
