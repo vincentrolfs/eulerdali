@@ -12,9 +12,10 @@
     define("constants", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
+        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
         exports.TOOLBAR_ID = "toolbar";
         exports.CANVAS_ID = "canvas";
+        exports.EXAMPLES_ID = "examples";
         exports.DEBOUNCE_TIMEOUT = 300;
         exports.RANDOMIZER_MAX_DEPTH = 5;
     });
@@ -27,9 +28,6 @@
                 this.element = document.getElementById(constants_1.CANVAS_ID);
                 this.element.width = document.body.clientWidth;
                 var toolbarHeight = document.getElementById(constants_1.TOOLBAR_ID).clientHeight;
-                console.log(toolbarHeight);
-                console.log(document.body.clientHeight - toolbarHeight);
-                console.log(document.body.clientHeight);
                 this.element.height = document.body.clientHeight - toolbarHeight;
                 this.ctx = this.element.getContext("2d");
                 this.ctx.fillRect(0, 0, this.element.width, this.element.height);
@@ -337,14 +335,26 @@
             }
             Parser.prototype.parse = function () {
                 Parser.registerGlobalMath();
+                this.showExampleOptions();
                 this.setEventListeners();
                 this.setExample(examples_1.initialExample);
             };
+            Parser.prototype.showExampleOptions = function () {
+                document.getElementById(constants_3.EXAMPLES_ID).innerHTML = examples_1.examples
+                    .map(function (_, index) { return "<a href=\"#\">" + (index + 1) + "</a>"; })
+                    .join(", ");
+            };
             Parser.prototype.setEventListeners = function () {
                 var _this = this;
+                document.querySelectorAll("#" + constants_3.EXAMPLES_ID + " a").forEach(function (el) {
+                    return el.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        _this.setExample(parseInt(event.currentTarget.innerText) - 1);
+                    });
+                });
                 Object.values(this.inputs).forEach(function (el) {
-                    return el.addEventListener("input", function (x) {
-                        return _this.onInputChange(x.currentTarget);
+                    return el.addEventListener("input", function (event) {
+                        return _this.onInputChange(event.currentTarget);
                     });
                 });
                 document
@@ -382,25 +392,13 @@
                 }
                 this.paint();
             };
-            Parser.prototype.setExample = function (index) {
-                var randomMode = index === undefined;
-                if (randomMode) {
-                    index = Math.floor(Math.random() * examples_1.examples.length);
-                }
-                var example = examples_1.examples[index];
-                var somethingChanged = false;
+            Parser.prototype.setExample = function (exampleNumber) {
+                var example = examples_1.examples[exampleNumber];
                 for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
                     var key = PaintInputNames_2[_i];
-                    somethingChanged =
-                        somethingChanged || this.inputs[key].value !== example[key];
                     this.inputs[key].value = example[key];
                 }
-                if (somethingChanged || !randomMode) {
-                    this.paint();
-                }
-                else {
-                    this.setExample();
-                }
+                this.paint();
             };
             Parser.prototype.paint = function () {
                 var paintInputs;

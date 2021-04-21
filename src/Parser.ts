@@ -1,6 +1,6 @@
 import { Painter } from "./Painter";
 import { ColorFunc, PaintInputNames, PaintInputs, ZoomFunc } from "./utilities";
-import { DEBOUNCE_TIMEOUT } from "./constants";
+import { DEBOUNCE_TIMEOUT, EXAMPLES_ID } from "./constants";
 import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
 
@@ -30,14 +30,30 @@ export class Parser {
 
   parse() {
     Parser.registerGlobalMath();
+    this.showExampleOptions();
     this.setEventListeners();
     this.setExample(initialExample);
   }
 
+  private showExampleOptions() {
+    document.getElementById(EXAMPLES_ID)!.innerHTML = examples
+      .map((_, index) => `<a href="#">${index + 1}</a>`)
+      .join(", ");
+  }
+
   private setEventListeners() {
+    document.querySelectorAll(`#${EXAMPLES_ID} a`).forEach((el) =>
+      el.addEventListener("click", (event) => {
+        event.preventDefault();
+        this.setExample(
+          parseInt((event.currentTarget as HTMLAnchorElement).innerText) - 1
+        );
+      })
+    );
+
     Object.values(this.inputs).forEach((el) =>
-      el.addEventListener("input", (x) =>
-        this.onInputChange(x.currentTarget as HTMLInputElement | null)
+      el.addEventListener("input", (event) =>
+        this.onInputChange(event.currentTarget as HTMLInputElement | null)
       )
     );
 
@@ -80,25 +96,14 @@ export class Parser {
     this.paint();
   }
 
-  private setExample(index?: number) {
-    const randomMode = index === undefined;
-    if (randomMode) {
-      index = Math.floor(Math.random() * examples.length);
-    }
-    const example = examples[index!];
-    let somethingChanged = false;
+  private setExample(exampleNumber: number) {
+    const example = examples[exampleNumber];
 
     for (const key of PaintInputNames) {
-      somethingChanged =
-        somethingChanged || this.inputs[key].value !== example[key];
       this.inputs[key].value = example[key];
     }
 
-    if (somethingChanged || !randomMode) {
-      this.paint();
-    } else {
-      this.setExample();
-    }
+    this.paint();
   }
 
   private paint() {
