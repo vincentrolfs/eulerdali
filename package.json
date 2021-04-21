@@ -9,6 +9,7 @@
     "typescript-bundle": "^1.0.17"
   },
   "scripts": {
-    "watch": "npx tsc-bundle tsconfig.json --outFile dist/main.js --watch"
+    "watch": "npx tsc-bundle tsconfig.json --outFile dist/main.js --watch",
+    "build": "npx tsc-bundle tsconfig.json --outFile dist/main.js"
   }
 }
