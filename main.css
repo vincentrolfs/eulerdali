@@ -2,8 +2,7 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 body {
@@ -15,14 +14,46 @@ body {
     font-family: sans-serif;
 }
 
+a {
+    color: cornflowerblue;
+}
+
+a:hover {
+    color: white;
+}
+
 #toolbar {
-    height: 90%;
+    padding: 8px;
+}
+
+#toolbar #toolbar-caption {
+    text-align: center;
+}
+
+#toolbar #toolbar-caption p {
+    margin: 0;
+}
+
+#toolbar #toolbar-inputs {
     display: flex;
     justify-content: space-around;
 }
 
-.input-wrapper {
+#toolbar .input-wrapper {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 25%;
+}
+
+#toolbar .button-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+#toolbar .button-wrapper button {
+    width: 100%;
+}
+
+#canvas {
+    display: block;
 }

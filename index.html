@@ -2,38 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="main.css"/>
     <title>Paint</title>
 </head>
 <body>
 
+<div id="toolbar">
+    <div id="toolbar-caption">
+        <strong>Eulerdali</strong>: An experiment by Vincent Rolfs.  <br/> <a href="#">Help / GitHub</a>.
+        Examples: <a href="#">1</a>, <a href="#">1</a>, <a href="#">1</a>.
+    </div>
+
+    <div id="toolbar-inputs">
+        <div class="input-wrapper">
+            <label for="input-red">Red</label>
+            <input type="text" id="input-red" value=""/>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-green">Green</label>
+            <input type="text" id="input-green" value=""/>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-blue">Blue</label>
+            <input type="text" id="input-blue" value=""/>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-zoom">Zoom</label>
+            <input type="text" id="input-zoom" value=""/>
+        </div>
+    </div>
+
+    <div class="button-wrapper">
+        <button id="button-random">Randomize</button>
+    </div>
+</div>
+
 <div id="canvas-wrapper">
     <canvas id="canvas" width="0" height="0"></canvas>
 </div>
-
-<div id="toolbar">
-    <div class="input-wrapper">
-        <label for="input-red">Red</label>
-        <input type="text" id="input-red" value=""/>
-    </div>
-
-    <div class="input-wrapper">
-        <label for="input-green">Green</label>
-        <input type="text" id="input-green" value=""/>
-    </div>
-
-    <div class="input-wrapper">
-        <label for="input-blue">Blue</label>
-        <input type="text" id="input-blue" value=""/>
-    </div>
-    
-    <div class="input-wrapper">
-        <label for="input-zoom">Zoom</label>
-        <input type="text" id="input-zoom" value=""/>
-    </div>
-</div>
-
-<button id="button-random">Randomize</button>
 
 <script src="dist/main.js"></script>
 </body>

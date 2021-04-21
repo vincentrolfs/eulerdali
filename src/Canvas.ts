@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT_RELATIVE, CANVAS_WIDTH_RELATIVE } from "./constants";
+import { CANVAS_ID, TOOLBAR_ID } from "./constants";
 
 export class Canvas {
   private element: HTMLCanvasElement;
@@ -6,15 +6,13 @@ export class Canvas {
   private pendingImageData: ImageData | undefined;
 
   constructor() {
-    this.element = document.getElementById("canvas") as HTMLCanvasElement;
-    this.element.width = Math.floor(
-      document.body.clientWidth * CANVAS_WIDTH_RELATIVE
-    );
-    this.element.height = Math.floor(
-      document.body.clientHeight * CANVAS_HEIGHT_RELATIVE
-    );
-    this.ctx = this.element.getContext("2d")!;
+    this.element = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
+    this.element.width = document.body.clientWidth;
 
+    const toolbarHeight = document.getElementById(TOOLBAR_ID)!.clientHeight;
+    this.element.height = document.body.clientHeight - toolbarHeight;
+
+    this.ctx = this.element.getContext("2d")!;
     this.ctx.fillRect(0, 0, this.element.width, this.element.height);
   }
 

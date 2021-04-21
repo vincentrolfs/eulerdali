@@ -12,9 +12,9 @@
     define("constants", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.CANVAS_HEIGHT_RELATIVE = exports.CANVAS_WIDTH_RELATIVE = void 0;
-        exports.CANVAS_WIDTH_RELATIVE = 1;
-        exports.CANVAS_HEIGHT_RELATIVE = 0.9;
+        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
+        exports.TOOLBAR_ID = "toolbar";
+        exports.CANVAS_ID = "canvas";
         exports.DEBOUNCE_TIMEOUT = 300;
         exports.RANDOMIZER_MAX_DEPTH = 5;
     });
@@ -24,9 +24,10 @@
         exports.Canvas = void 0;
         var Canvas = /** @class */ (function () {
             function Canvas() {
-                this.element = document.getElementById("canvas");
-                this.element.width = Math.floor(document.body.clientWidth * constants_1.CANVAS_WIDTH_RELATIVE);
-                this.element.height = Math.floor(document.body.clientHeight * constants_1.CANVAS_HEIGHT_RELATIVE);
+                this.element = document.getElementById(constants_1.CANVAS_ID);
+                this.element.width = document.body.clientWidth;
+                var toolbarHeight = document.getElementById(constants_1.TOOLBAR_ID).clientHeight;
+                this.element.height = document.body.clientHeight - toolbarHeight;
                 this.ctx = this.element.getContext("2d");
                 this.ctx.fillRect(0, 0, this.element.width, this.element.height);
             }
