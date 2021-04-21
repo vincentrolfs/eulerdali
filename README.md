@@ -13,6 +13,8 @@ You can use the `zoom` input for... zooming. The higher the number, the closer y
 
 A click on `randomize` creates random formulas. Feel free to try it a bunch of times until you find a cool image.
 
+Eulerdali is open-sourced software licensed under the MIT license.
+
 ## How?
 
 Eulerdali is written in TypeScript, without any frameworks. It sets the pixel colors in a HTML canvas using `putImageData`. This is much more efficient than calling `fillRect` a bunch of times.
@@ -20,3 +22,7 @@ Eulerdali is written in TypeScript, without any frameworks. It sets the pixel co
 The random formulas are built recursively by randomly choosing between a bunch of nullary, unary and binary operations.
 
 If you have any questions, feel free to open an issue.
+
+## Who?
+
+Eulerdali was created by [Vincent Rolfs](https://vincentrolfs.github.io).
