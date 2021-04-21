@@ -1,6 +1,8 @@
 # Eulerdali
 
-![alt text](cover.png)
+<p align="center">
+  <img width="460" height="201" src="cover.png" alt="Eulerdali example image">
+</p>
 
 Create beautiful images using math equations.
 
