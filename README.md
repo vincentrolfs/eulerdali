@@ -1,4 +1,7 @@
 # Eulerdali
+
+![alt text](cover.png)
+
 Create beautiful images using math equations.
 
 ## Why?
