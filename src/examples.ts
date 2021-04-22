@@ -77,4 +77,16 @@ export const examples: Example[] = [
     blue: "0.01/(((x-8)*y % 3)/3)",
     zoom: "1/5",
   },
+  {
+    red: "log(cos(y)-x/y)*4",
+    green: "log(cos(y)-x/y)**4",
+    blue: "2/sqrt(abs(2*y))",
+    zoom: "1/20",
+  },
+  {
+    red: "log(cos(x)*cos(y)+1)",
+    green: "log(cos(x)*cos(y)+1)**2",
+    blue: "log(cos(x)*cos(y)+1)**3",
+    zoom: "1/9",
+  },
 ];

@@ -12,12 +12,13 @@
     define("constants", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
+        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
         exports.TOOLBAR_ID = "toolbar";
         exports.CANVAS_ID = "canvas";
         exports.EXAMPLES_ID = "examples";
         exports.DEBOUNCE_TIMEOUT = 300;
-        exports.RANDOMIZER_MAX_DEPTH = 5;
+        exports.RANDOMIZER_MIN_DEPTH = 1;
+        exports.RANDOMIZER_MAX_DEPTH = 6;
     });
     define("Canvas", ["require", "exports", "constants"], function (require, exports, constants_1) {
         "use strict";
@@ -223,6 +224,18 @@
                 blue: "0.01/(((x-8)*y % 3)/3)",
                 zoom: "1/5",
             },
+            {
+                red: "log(cos(y)-x/y)*4",
+                green: "log(cos(y)-x/y)**4",
+                blue: "2/sqrt(abs(2*y))",
+                zoom: "1/20",
+            },
+            {
+                red: "log(cos(x)*cos(y)+1)",
+                green: "log(cos(x)*cos(y)+1)**2",
+                blue: "log(cos(x)*cos(y)+1)**3",
+                zoom: "1/9",
+            },
         ];
     });
     define("Randomizer", ["require", "exports", "constants"], function (require, exports, constants_2) {
@@ -270,22 +283,25 @@
             function Randomizer() {
             }
             Randomizer.prototype.randomFunc = function () {
-                return this.createSubFunc(1);
+                var targetDepth = this.randInt(constants_2.RANDOMIZER_MIN_DEPTH, constants_2.RANDOMIZER_MAX_DEPTH);
+                return this.createSubFunc(1, targetDepth);
             };
             Randomizer.prototype.randomZoom = function () {
                 return "1/" + this.randInt(1, 10);
             };
-            Randomizer.prototype.createSubFunc = function (currentDepth) {
-                var arity = this.randInt(0, 2);
-                if (constants_2.RANDOMIZER_MAX_DEPTH === currentDepth || arity === 0) {
+            Randomizer.prototype.createSubFunc = function (currentDepth, targetDepth) {
+                if (currentDepth === targetDepth) {
                     return this.nullaryOperation();
                 }
-                else if (arity === 1) {
-                    return this.unaryOperation(this.createSubFunc(currentDepth + 1));
+                var arity = this.randInt(1, 2);
+                if (arity === 1) {
+                    return this.unaryOperation(this.createSubFunc(currentDepth + 1, targetDepth));
                 }
-                else {
-                    return this.binaryOperation(this.createSubFunc(currentDepth + 1), this.createSubFunc(currentDepth + 1));
-                }
+                var secondTargetDepth = this.randInt(currentDepth + 1, targetDepth);
+                var decider = this.randInt(0, 1);
+                var targetDepth0 = decider === 0 ? targetDepth : secondTargetDepth;
+                var targetDepth1 = decider === 1 ? targetDepth : secondTargetDepth;
+                return this.binaryOperation(this.createSubFunc(currentDepth + 1, targetDepth0), this.createSubFunc(currentDepth + 1, targetDepth1));
             };
             Randomizer.prototype.nullaryOperation = function () {
                 var n = this.randInt(-5, 5);
@@ -303,11 +319,13 @@
             Randomizer.prototype.sample = function (array) {
                 return array[this.randInt(0, array.length - 1)];
             };
-            Randomizer.prototype.randInt = function (minInclusive, maxInclusive) {
-                return Math.round(this.randFloat(minInclusive, maxInclusive));
+            Randomizer.prototype.randInt = function (minInclusive, maxInclusive, skew) {
+                if (skew === void 0) { skew = 1; }
+                return Math.round(this.randFloat(minInclusive, maxInclusive, skew));
             };
-            Randomizer.prototype.randFloat = function (minInclusive, maxInclusive) {
-                return (maxInclusive - minInclusive) * Math.random() + minInclusive;
+            Randomizer.prototype.randFloat = function (minInclusive, maxInclusive, skew) {
+                if (skew === void 0) { skew = 1; }
+                return (maxInclusive - minInclusive) * Math.pow(Math.random(), skew) + minInclusive;
             };
             return Randomizer;
         }());

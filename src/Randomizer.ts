@@ -1,4 +1,4 @@
-import { RANDOMIZER_MAX_DEPTH } from "./constants";
+import { RANDOMIZER_MAX_DEPTH, RANDOMIZER_MIN_DEPTH } from "./constants";
 
 type NullaryOperation = (n: number) => string;
 type UnaryOperation = (s: string) => string;
@@ -46,26 +46,40 @@ const BINARY_OPERATIONS: BinaryOperation[] = [
 
 export class Randomizer {
   randomFunc(): string {
-    return this.createSubFunc(1);
+    const targetDepth = this.randInt(
+      RANDOMIZER_MIN_DEPTH,
+      RANDOMIZER_MAX_DEPTH
+    );
+
+    return this.createSubFunc(1, targetDepth);
   }
 
   randomZoom(): string {
     return `1/${this.randInt(1, 10)}`;
   }
 
-  private createSubFunc(currentDepth: number): string {
-    const arity = this.randInt(0, 2);
-
-    if (RANDOMIZER_MAX_DEPTH === currentDepth || arity === 0) {
+  private createSubFunc(currentDepth: number, targetDepth: number): string {
+    if (currentDepth === targetDepth) {
       return this.nullaryOperation();
-    } else if (arity === 1) {
-      return this.unaryOperation(this.createSubFunc(currentDepth + 1));
-    } else {
-      return this.binaryOperation(
-        this.createSubFunc(currentDepth + 1),
-        this.createSubFunc(currentDepth + 1)
+    }
+
+    const arity = this.randInt(1, 2);
+
+    if (arity === 1) {
+      return this.unaryOperation(
+        this.createSubFunc(currentDepth + 1, targetDepth)
       );
     }
+
+    const secondTargetDepth = this.randInt(currentDepth + 1, targetDepth);
+    const decider = this.randInt(0, 1);
+    const targetDepth0 = decider === 0 ? targetDepth : secondTargetDepth;
+    const targetDepth1 = decider === 1 ? targetDepth : secondTargetDepth;
+
+    return this.binaryOperation(
+      this.createSubFunc(currentDepth + 1, targetDepth0),
+      this.createSubFunc(currentDepth + 1, targetDepth1)
+    );
   }
 
   private nullaryOperation(): string {
@@ -91,11 +105,19 @@ export class Randomizer {
     return array[this.randInt(0, array.length - 1)];
   }
 
-  private randInt(minInclusive: number, maxInclusive: number) {
-    return Math.round(this.randFloat(minInclusive, maxInclusive));
+  private randInt(
+    minInclusive: number,
+    maxInclusive: number,
+    skew: number = 1
+  ) {
+    return Math.round(this.randFloat(minInclusive, maxInclusive, skew));
   }
 
-  private randFloat(minInclusive: number, maxInclusive: number) {
-    return (maxInclusive - minInclusive) * Math.random() + minInclusive;
+  private randFloat(
+    minInclusive: number,
+    maxInclusive: number,
+    skew: number = 1
+  ) {
+    return (maxInclusive - minInclusive) * Math.random() ** skew + minInclusive;
   }
 }
