@@ -28,11 +28,24 @@
             function Canvas() {
                 this.element = document.getElementById(constants_1.CANVAS_ID);
                 this.element.width = document.body.clientWidth;
-                var toolbarHeight = document.getElementById(constants_1.TOOLBAR_ID).clientHeight;
-                this.element.height = document.body.clientHeight - toolbarHeight;
+                this.element.height = document.body.clientHeight;
                 this.ctx = this.element.getContext("2d");
                 this.ctx.fillRect(0, 0, this.element.width, this.element.height);
             }
+            Object.defineProperty(Canvas.prototype, "width", {
+                get: function () {
+                    return this.element.width;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(Canvas.prototype, "height", {
+                get: function () {
+                    return this.element.height;
+                },
+                enumerable: false,
+                configurable: true
+            });
             Canvas.prototype.setPixel = function (x, y, color) {
                 if (!this.pendingImageData) {
                     throw new Error("No job has been started.");
@@ -63,20 +76,6 @@
                 this.ctx.putImageData(this.pendingImageData, 0, 0);
                 this.pendingImageData = undefined;
             };
-            Object.defineProperty(Canvas.prototype, "width", {
-                get: function () {
-                    return this.element.width;
-                },
-                enumerable: false,
-                configurable: true
-            });
-            Object.defineProperty(Canvas.prototype, "height", {
-                get: function () {
-                    return this.element.height;
-                },
-                enumerable: false,
-                configurable: true
-            });
             return Canvas;
         }());
         exports.Canvas = Canvas;

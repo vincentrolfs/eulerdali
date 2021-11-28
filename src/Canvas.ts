@@ -1,4 +1,4 @@
-import { CANVAS_ID, TOOLBAR_ID } from "./constants";
+import { CANVAS_ID } from "./constants";
 
 export class Canvas {
   private element: HTMLCanvasElement;
@@ -8,12 +8,18 @@ export class Canvas {
   constructor() {
     this.element = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
     this.element.width = document.body.clientWidth;
-
-    const toolbarHeight = document.getElementById(TOOLBAR_ID)!.clientHeight;
-    this.element.height = document.body.clientHeight - toolbarHeight;
+    this.element.height = document.body.clientHeight;
 
     this.ctx = this.element.getContext("2d")!;
     this.ctx.fillRect(0, 0, this.element.width, this.element.height);
+  }
+
+  get width() {
+    return this.element.width;
+  }
+
+  get height() {
+    return this.element.height;
   }
 
   setPixel(
@@ -59,13 +65,5 @@ export class Canvas {
     }
     this.ctx.putImageData(this.pendingImageData, 0, 0);
     this.pendingImageData = undefined;
-  }
-
-  get width() {
-    return this.element.width;
-  }
-
-  get height() {
-    return this.element.height;
   }
 }
