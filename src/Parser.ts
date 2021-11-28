@@ -59,6 +59,15 @@ export class Parser {
     this.setEventListeners();
   }
 
+  getValues(): Record<PaintInputName, string> {
+    return {
+      red: this.inputs.red.value,
+      green: this.inputs.green.value,
+      blue: this.inputs.blue.value,
+      zoom: this.inputs.zoom.value,
+    };
+  }
+
   private setEventListeners() {
     Object.values(this.inputs).forEach((el) =>
       el.addEventListener("input", (event) =>

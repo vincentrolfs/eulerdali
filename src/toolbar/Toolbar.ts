@@ -2,9 +2,11 @@ import { Parser } from "../Parser";
 import { EXAMPLES_ID } from "../common/constants";
 import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
+import { PaintInputNames } from "../common/utilities";
 
 const BUTTON_ID_RANDOM = "#button-random";
 const BUTTON_ID_HELP = "#button-help";
+const BUTTON_ID_SHARE = "#button-share";
 
 const HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
 
@@ -49,6 +51,10 @@ export class Toolbar {
       .addEventListener("click", () => this.setRandom());
 
     document
+      .querySelector(BUTTON_ID_SHARE)!
+      .addEventListener("click", () => this.share());
+
+    document
       .querySelector(BUTTON_ID_HELP)!
       .addEventListener("click", () => window.open(HELP_URL, "_blank"));
   }
@@ -64,5 +70,25 @@ export class Toolbar {
       blue: this.randomizer.randomFunc(),
       zoom: this.randomizer.randomZoom(),
     });
+  }
+
+  private share() {
+    console.log(111);
+    const url = this.getSharingUrl();
+
+    alert(url);
+  }
+
+  private getSharingUrl() {
+    const baseUrl =
+      location.protocol + "//" + location.host + location.pathname + "?";
+    const values = this.parser.getValues();
+    const encodedValues = [];
+
+    for (const key of PaintInputNames) {
+      encodedValues.push(`${key}=${encodeURIComponent(values[key])}`);
+    }
+
+    return baseUrl + encodedValues.join("&");
   }
 }
