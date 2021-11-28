@@ -4,9 +4,9 @@ import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
 import { PaintInputNames } from "../common/utilities";
 
-const BUTTON_ID_RANDOM = "#button-random";
-const BUTTON_ID_HELP = "#button-help";
-const BUTTON_ID_SHARE = "#button-share";
+const BUTTON_ID_RANDOM = "button-random";
+const BUTTON_ID_HELP = "button-help";
+const BUTTON_ID_SHARE = "button-share";
 
 const HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
 
@@ -47,15 +47,15 @@ export class Toolbar {
       });
 
     document
-      .querySelector(BUTTON_ID_RANDOM)!
+      .getElementById(BUTTON_ID_RANDOM)!
       .addEventListener("click", () => this.setRandom());
 
     document
-      .querySelector(BUTTON_ID_SHARE)!
+      .getElementById(BUTTON_ID_SHARE)!
       .addEventListener("click", () => this.share());
 
     document
-      .querySelector(BUTTON_ID_HELP)!
+      .getElementById(BUTTON_ID_HELP)!
       .addEventListener("click", () => window.open(HELP_URL, "_blank"));
   }
 
@@ -73,10 +73,18 @@ export class Toolbar {
   }
 
   private share() {
-    console.log(111);
     const url = this.getSharingUrl();
 
-    alert(url);
+    if (navigator.share) {
+      return navigator.share({ url }).then(() => void 0);
+    }
+
+    // @ts-ignore
+    if (navigator?.clipboard?.writeText) {
+      return navigator.clipboard
+        .writeText(url)
+        .then(() => alert("Copied URL to clipboard!"));
+    }
   }
 
   private getSharingUrl() {

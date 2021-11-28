@@ -188,6 +188,14 @@
             Parser.prototype.activate = function () {
                 this.setEventListeners();
             };
+            Parser.prototype.getValues = function () {
+                return {
+                    red: this.inputs.red.value,
+                    green: this.inputs.green.value,
+                    blue: this.inputs.blue.value,
+                    zoom: this.inputs.zoom.value,
+                };
+            };
             Parser.prototype.setEventListeners = function () {
                 var _this = this;
                 Object.values(this.inputs).forEach(function (el) {
@@ -424,12 +432,13 @@
         }());
         exports.Randomizer = Randomizer;
     });
-    define("toolbar/Toolbar", ["require", "exports", "common/constants", "toolbar/examples", "toolbar/Randomizer"], function (require, exports, constants_4, examples_1, Randomizer_1) {
+    define("toolbar/Toolbar", ["require", "exports", "common/constants", "toolbar/examples", "toolbar/Randomizer", "common/utilities"], function (require, exports, constants_4, examples_1, Randomizer_1, utilities_2) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Toolbar = void 0;
-        var BUTTON_ID_RANDOM = "#button-random";
-        var BUTTON_ID_HELP = "#button-help";
+        var BUTTON_ID_RANDOM = "button-random";
+        var BUTTON_ID_HELP = "button-help";
+        var BUTTON_ID_SHARE = "button-share";
         var HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
         var Toolbar = /** @class */ (function () {
             function Toolbar(parser) {
@@ -460,10 +469,13 @@
                     target.value = "-1";
                 });
                 document
-                    .querySelector(BUTTON_ID_RANDOM)
+                    .getElementById(BUTTON_ID_RANDOM)
                     .addEventListener("click", function () { return _this.setRandom(); });
                 document
-                    .querySelector(BUTTON_ID_HELP)
+                    .getElementById(BUTTON_ID_SHARE)
+                    .addEventListener("click", function () { return _this.share(); });
+                document
+                    .getElementById(BUTTON_ID_HELP)
                     .addEventListener("click", function () { return window.open(HELP_URL, "_blank"); });
             };
             Toolbar.prototype.setExample = function (exampleNumber) {
@@ -476,6 +488,29 @@
                     blue: this.randomizer.randomFunc(),
                     zoom: this.randomizer.randomZoom(),
                 });
+            };
+            Toolbar.prototype.share = function () {
+                var _a;
+                var url = this.getSharingUrl();
+                if (navigator.share) {
+                    return navigator.share({ url: url }).then(function () { return void 0; });
+                }
+                // @ts-ignore
+                if ((_a = navigator === null || navigator === void 0 ? void 0 : navigator.clipboard) === null || _a === void 0 ? void 0 : _a.writeText) {
+                    return navigator.clipboard
+                        .writeText(url)
+                        .then(function () { return alert("Copied URL to clipboard!"); });
+                }
+            };
+            Toolbar.prototype.getSharingUrl = function () {
+                var baseUrl = location.protocol + "//" + location.host + location.pathname + "?";
+                var values = this.parser.getValues();
+                var encodedValues = [];
+                for (var _i = 0, PaintInputNames_2 = utilities_2.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
+                    var key = PaintInputNames_2[_i];
+                    encodedValues.push(key + "=" + encodeURIComponent(values[key]));
+                }
+                return baseUrl + encodedValues.join("&");
             };
             return Toolbar;
         }());
