@@ -18,9 +18,9 @@ I wanted to explore the relationship between mathematical formulas and art.
 
 The sign of the output is ignored. An output of `1` or higher corresponds to maximum brightness. You can use all the functions from the [JavaScript `Math` object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math).
 
-You can use the `zoom` input for... zooming. The higher the number, the closer you zoom in.
+You can use the `zoom` input for zooming. The higher the number, the closer you zoom in.
 
-A click on `randomize` creates random formulas. Feel free to try it a bunch of times until you find a cool image.
+A click on `Random` creates random formulas and displays the resulting image. Feel free to try it a bunch of times until you find a cool image.
 
 Eulerdali is open-sourced software licensed under the MIT license.
 

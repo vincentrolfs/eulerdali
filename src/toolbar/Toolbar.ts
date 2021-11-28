@@ -4,6 +4,9 @@ import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
 
 const BUTTON_ID_RANDOM = "#button-random";
+const BUTTON_ID_HELP = "#button-help";
+
+const HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
 
 export class Toolbar {
   private readonly randomizer: Randomizer;
@@ -19,14 +22,11 @@ export class Toolbar {
   }
 
   private showExampleOptions() {
-    document.getElementById(EXAMPLES_ID)!.innerHTML =
-      `<option value="-1">&gt; Display example</option>` +
-      examples
-        .map(
-          (example, index) =>
-            `<option value="${index}">${example.name}</option>`
-        )
-        .join(", ");
+    document.getElementById(EXAMPLES_ID)!.innerHTML += examples
+      .map(
+        (example, index) => `<option value="${index}">${example.name}</option>`
+      )
+      .join(", ");
   }
 
   private setEventListeners() {
@@ -47,6 +47,10 @@ export class Toolbar {
     document
       .querySelector(BUTTON_ID_RANDOM)!
       .addEventListener("click", () => this.setRandom());
+
+    document
+      .querySelector(BUTTON_ID_HELP)!
+      .addEventListener("click", () => window.open(HELP_URL, "_blank"));
   }
 
   private setExample(exampleNumber: number) {

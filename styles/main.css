@@ -1,0 +1,85 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+
+    color: white;
+    background: black;
+    font-family: Lato, sans-serif;
+    font-size: 10pt;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: #BBBBBB;
+}
+
+#canvas {
+    display: block;
+}
+
+#toolbar {
+    width: 100%;
+    margin: 0;
+
+    position: absolute;
+    bottom: 0;
+
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#toolbar-caption {
+    text-align: center;
+    margin: 5pt 0;
+}
+
+#toolbar-inputs, #toolbar-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+#toolbar-inputs .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+}
+
+#toolbar-inputs label {
+    font-style: italic;
+}
+
+#toolbar-inputs label .color {
+    display: inline-block;
+    margin-left: 2pt;
+    width: 5pt;
+    height: 5pt;
+}
+
+#toolbar-inputs label .color.color-red {
+    background: rgb(255, 0, 0);
+}
+
+#toolbar-inputs label .color.color-green {
+    background: rgb(0, 255, 0);
+}
+
+#toolbar-inputs label .color.color-blue {
+    background: rgb(0, 0, 255);
+}
+
+#toolbar-inputs input {
+    margin-bottom: 5pt;
+}
+
+#toolbar-inputs .action {
+    height: 40px;
+}

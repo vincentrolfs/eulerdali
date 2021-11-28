@@ -429,6 +429,8 @@
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Toolbar = void 0;
         var BUTTON_ID_RANDOM = "#button-random";
+        var BUTTON_ID_HELP = "#button-help";
+        var HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
         var Toolbar = /** @class */ (function () {
             function Toolbar(parser) {
                 this.parser = parser;
@@ -440,13 +442,9 @@
                 this.setExample(examples_1.initialExample);
             };
             Toolbar.prototype.showExampleOptions = function () {
-                document.getElementById(constants_4.EXAMPLES_ID).innerHTML =
-                    "<option value=\"-1\">&gt; Display example</option>" +
-                        examples_1.examples
-                            .map(function (example, index) {
-                            return "<option value=\"" + index + "\">" + example.name + "</option>";
-                        })
-                            .join(", ");
+                document.getElementById(constants_4.EXAMPLES_ID).innerHTML += examples_1.examples
+                    .map(function (example, index) { return "<option value=\"" + index + "\">" + example.name + "</option>"; })
+                    .join(", ");
             };
             Toolbar.prototype.setEventListeners = function () {
                 var _this = this;
@@ -464,6 +462,9 @@
                 document
                     .querySelector(BUTTON_ID_RANDOM)
                     .addEventListener("click", function () { return _this.setRandom(); });
+                document
+                    .querySelector(BUTTON_ID_HELP)
+                    .addEventListener("click", function () { return window.open(HELP_URL, "_blank"); });
             };
             Toolbar.prototype.setExample = function (exampleNumber) {
                 this.parser.overwrite(examples_1.examples[exampleNumber]);
