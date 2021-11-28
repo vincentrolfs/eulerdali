@@ -1,5 +1,5 @@
 import { Canvas } from "./Canvas";
-import { ColorFunc, PaintInputs, ZoomFunc } from "./utilities";
+import { ColorFunc, PaintInputs, ZoomFunc } from "./common/utilities";
 
 export class Painter {
   constructor(private readonly canvas: Canvas) {}

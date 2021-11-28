@@ -1,21 +1,23 @@
 import { Painter } from "./Painter";
-import { ColorFunc, PaintInputNames, PaintInputs, ZoomFunc } from "./utilities";
-import { DEBOUNCE_TIMEOUT, EXAMPLES_ID } from "./constants";
-import { examples, initialExample } from "./examples";
-import { Randomizer } from "./Randomizer";
+import {
+  ColorFunc,
+  PaintInputName,
+  PaintInputNames,
+  PaintInputs,
+  ZoomFunc,
+} from "./common/utilities";
+import { DEBOUNCE_TIMEOUT } from "./common/constants";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
 const INPUT_ID_BLUE = "#input-blue";
 const INPUT_ID_ZOOM = "#input-zoom";
-const BUTTON_ID_RANDOM = "#button-random";
 
 type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
 
 export class Parser {
   private readonly inputs: InputMap;
   private inputTimeout: number | undefined;
-  private readonly randomizer: Randomizer;
 
   constructor(private readonly painter: Painter) {
     this.inputs = {
@@ -25,41 +27,7 @@ export class Parser {
       zoom: document.querySelector(INPUT_ID_ZOOM)!,
     };
 
-    this.randomizer = new Randomizer();
-  }
-
-  parse() {
     Parser.registerGlobalMath();
-    this.showExampleOptions();
-    this.setEventListeners();
-    this.setExample(initialExample);
-  }
-
-  private showExampleOptions() {
-    document.getElementById(EXAMPLES_ID)!.innerHTML = examples
-      .map((_, index) => `<a href="#">${index + 1}</a>`)
-      .join(", ");
-  }
-
-  private setEventListeners() {
-    document.querySelectorAll(`#${EXAMPLES_ID} a`).forEach((el) =>
-      el.addEventListener("click", (event) => {
-        event.preventDefault();
-        this.setExample(
-          parseInt((event.currentTarget as HTMLAnchorElement).innerText) - 1
-        );
-      })
-    );
-
-    Object.values(this.inputs).forEach((el) =>
-      el.addEventListener("input", (event) =>
-        this.onInputChange(event.currentTarget as HTMLInputElement | null)
-      )
-    );
-
-    document
-      .querySelector(BUTTON_ID_RANDOM)!
-      .addEventListener("click", () => this.setRandom());
   }
 
   private static registerGlobalMath() {
@@ -69,6 +37,34 @@ export class Parser {
         window[key] = Math[key];
       }
     }
+  }
+
+  private static buildColorFunc(funcDescription: string): ColorFunc {
+    return new Function("x", "y", `return ${funcDescription};`) as ColorFunc;
+  }
+
+  private static buildZoomFunc(funcDescription: string): ZoomFunc {
+    return new Function(`return ${funcDescription};`) as ZoomFunc;
+  }
+
+  overwrite(values: Record<PaintInputName, string>) {
+    for (const key of PaintInputNames) {
+      this.inputs[key].value = values[key];
+    }
+
+    this.paint();
+  }
+
+  activate() {
+    this.setEventListeners();
+  }
+
+  private setEventListeners() {
+    Object.values(this.inputs).forEach((el) =>
+      el.addEventListener("input", (event) =>
+        this.onInputChange(event.currentTarget as HTMLInputElement | null)
+      )
+    );
   }
 
   private onInputChange(el: HTMLInputElement | null) {
@@ -83,27 +79,6 @@ export class Parser {
 
       this.paint();
     }, DEBOUNCE_TIMEOUT);
-  }
-
-  private setRandom() {
-    for (const key of PaintInputNames) {
-      this.inputs[key].value =
-        key === "zoom"
-          ? this.randomizer.randomZoom()
-          : this.randomizer.randomFunc();
-    }
-
-    this.paint();
-  }
-
-  private setExample(exampleNumber: number) {
-    const example = examples[exampleNumber];
-
-    for (const key of PaintInputNames) {
-      this.inputs[key].value = example[key];
-    }
-
-    this.paint();
   }
 
   private paint() {
@@ -127,13 +102,5 @@ export class Parser {
       blue: Parser.buildColorFunc(this.inputs.blue.value),
       zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
     };
-  }
-
-  private static buildColorFunc(funcDescription: string): ColorFunc {
-    return new Function("x", "y", `return ${funcDescription};`) as ColorFunc;
-  }
-
-  private static buildZoomFunc(funcDescription: string): ZoomFunc {
-    return new Function(`return ${funcDescription};`) as ZoomFunc;
   }
 }

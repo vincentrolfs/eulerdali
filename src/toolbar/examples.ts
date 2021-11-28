@@ -1,8 +1,7 @@
-import { PaintInputs } from "./utilities";
+import { PaintInputName } from "../common/utilities";
 
-export type Example = Record<keyof PaintInputs, string>;
 export const initialExample = 0;
-export const examples: Example[] = [
+export const examples: Record<PaintInputName, string>[] = [
   {
     red: "(x-1) % y",
     green: "x % y",

@@ -1,4 +1,4 @@
-import { CANVAS_ID } from "./constants";
+import { CANVAS_ID } from "./common/constants";
 
 export class Canvas {
   private element: HTMLCanvasElement;

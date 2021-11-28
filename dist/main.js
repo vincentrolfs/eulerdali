@@ -9,18 +9,17 @@
         Object.defineProperty(exports, "__cjsModule", { value: true });
         Object.defineProperty(exports, "default", { value: function (name) { return resolve(name); } });
     });
-    define("constants", ["require", "exports"], function (require, exports) {
+    define("common/constants", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = exports.TOOLBAR_ID = void 0;
-        exports.TOOLBAR_ID = "toolbar";
+        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = void 0;
         exports.CANVAS_ID = "canvas";
         exports.EXAMPLES_ID = "examples";
         exports.DEBOUNCE_TIMEOUT = 300;
         exports.RANDOMIZER_MIN_DEPTH = 1;
         exports.RANDOMIZER_MAX_DEPTH = 6;
     });
-    define("Canvas", ["require", "exports", "constants"], function (require, exports, constants_1) {
+    define("Canvas", ["require", "exports", "common/constants"], function (require, exports, constants_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Canvas = void 0;
@@ -80,7 +79,7 @@
         }());
         exports.Canvas = Canvas;
     });
-    define("utilities", ["require", "exports"], function (require, exports) {
+    define("common/utilities", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.PaintInputNames = void 0;
@@ -145,7 +144,95 @@
         }());
         exports.Painter = Painter;
     });
-    define("examples", ["require", "exports"], function (require, exports) {
+    define("Parser", ["require", "exports", "common/utilities", "common/constants"], function (require, exports, utilities_1, constants_2) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.Parser = void 0;
+        var INPUT_ID_RED = "#input-red";
+        var INPUT_ID_GREEN = "#input-green";
+        var INPUT_ID_BLUE = "#input-blue";
+        var INPUT_ID_ZOOM = "#input-zoom";
+        var Parser = /** @class */ (function () {
+            function Parser(painter) {
+                this.painter = painter;
+                this.inputs = {
+                    red: document.querySelector(INPUT_ID_RED),
+                    green: document.querySelector(INPUT_ID_GREEN),
+                    blue: document.querySelector(INPUT_ID_BLUE),
+                    zoom: document.querySelector(INPUT_ID_ZOOM),
+                };
+                Parser.registerGlobalMath();
+            }
+            Parser.registerGlobalMath = function () {
+                for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
+                        // @ts-ignore
+                        window[key] = Math[key];
+                    }
+                }
+            };
+            Parser.buildColorFunc = function (funcDescription) {
+                return new Function("x", "y", "return " + funcDescription + ";");
+            };
+            Parser.buildZoomFunc = function (funcDescription) {
+                return new Function("return " + funcDescription + ";");
+            };
+            Parser.prototype.overwrite = function (values) {
+                for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
+                    var key = PaintInputNames_1[_i];
+                    this.inputs[key].value = values[key];
+                }
+                this.paint();
+            };
+            Parser.prototype.activate = function () {
+                this.setEventListeners();
+            };
+            Parser.prototype.setEventListeners = function () {
+                var _this = this;
+                Object.values(this.inputs).forEach(function (el) {
+                    return el.addEventListener("input", function (event) {
+                        return _this.onInputChange(event.currentTarget);
+                    });
+                });
+            };
+            Parser.prototype.onInputChange = function (el) {
+                var _this = this;
+                if (this.inputTimeout !== undefined) {
+                    clearTimeout(this.inputTimeout);
+                }
+                this.inputTimeout = setTimeout(function () {
+                    if (!el || !el.id || !el.value) {
+                        return;
+                    }
+                    _this.paint();
+                }, constants_2.DEBOUNCE_TIMEOUT);
+            };
+            Parser.prototype.paint = function () {
+                var paintInputs;
+                try {
+                    paintInputs = this.buildPaintInputs();
+                }
+                catch (e) {
+                    console.error(e);
+                }
+                if (paintInputs) {
+                    this.painter.paint(paintInputs);
+                }
+            };
+            Parser.prototype.buildPaintInputs = function () {
+                return {
+                    red: Parser.buildColorFunc(this.inputs.red.value),
+                    green: Parser.buildColorFunc(this.inputs.green.value),
+                    blue: Parser.buildColorFunc(this.inputs.blue.value),
+                    zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
+                };
+            };
+            return Parser;
+        }());
+        exports.Parser = Parser;
+    });
+    define("toolbar/examples", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.examples = exports.initialExample = void 0;
@@ -237,7 +324,7 @@
             },
         ];
     });
-    define("Randomizer", ["require", "exports", "constants"], function (require, exports, constants_2) {
+    define("toolbar/Randomizer", ["require", "exports", "common/constants"], function (require, exports, constants_3) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Randomizer = void 0;
@@ -282,7 +369,7 @@
             function Randomizer() {
             }
             Randomizer.prototype.randomFunc = function () {
-                var targetDepth = this.randInt(constants_2.RANDOMIZER_MIN_DEPTH, constants_2.RANDOMIZER_MAX_DEPTH);
+                var targetDepth = this.randInt(constants_3.RANDOMIZER_MIN_DEPTH, constants_3.RANDOMIZER_MAX_DEPTH);
                 return this.createSubFunc(1, targetDepth);
             };
             Randomizer.prototype.randomZoom = function () {
@@ -330,124 +417,56 @@
         }());
         exports.Randomizer = Randomizer;
     });
-    define("Parser", ["require", "exports", "utilities", "constants", "examples", "Randomizer"], function (require, exports, utilities_1, constants_3, examples_1, Randomizer_1) {
+    define("toolbar/Toolbar", ["require", "exports", "common/constants", "toolbar/examples", "toolbar/Randomizer"], function (require, exports, constants_4, examples_1, Randomizer_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.Parser = void 0;
-        var INPUT_ID_RED = "#input-red";
-        var INPUT_ID_GREEN = "#input-green";
-        var INPUT_ID_BLUE = "#input-blue";
-        var INPUT_ID_ZOOM = "#input-zoom";
+        exports.Toolbar = void 0;
         var BUTTON_ID_RANDOM = "#button-random";
-        var Parser = /** @class */ (function () {
-            function Parser(painter) {
-                this.painter = painter;
-                this.inputs = {
-                    red: document.querySelector(INPUT_ID_RED),
-                    green: document.querySelector(INPUT_ID_GREEN),
-                    blue: document.querySelector(INPUT_ID_BLUE),
-                    zoom: document.querySelector(INPUT_ID_ZOOM),
-                };
+        var Toolbar = /** @class */ (function () {
+            function Toolbar(parser) {
+                this.parser = parser;
                 this.randomizer = new Randomizer_1.Randomizer();
             }
-            Parser.prototype.parse = function () {
-                Parser.registerGlobalMath();
+            Toolbar.prototype.activate = function () {
                 this.showExampleOptions();
                 this.setEventListeners();
                 this.setExample(examples_1.initialExample);
             };
-            Parser.prototype.showExampleOptions = function () {
-                document.getElementById(constants_3.EXAMPLES_ID).innerHTML = examples_1.examples
+            Toolbar.prototype.showExampleOptions = function () {
+                document.getElementById(constants_4.EXAMPLES_ID).innerHTML = examples_1.examples
                     .map(function (_, index) { return "<a href=\"#\">" + (index + 1) + "</a>"; })
                     .join(", ");
             };
-            Parser.prototype.setEventListeners = function () {
+            Toolbar.prototype.setEventListeners = function () {
                 var _this = this;
-                document.querySelectorAll("#" + constants_3.EXAMPLES_ID + " a").forEach(function (el) {
+                document.querySelectorAll("#" + constants_4.EXAMPLES_ID + " a").forEach(function (el) {
                     return el.addEventListener("click", function (event) {
                         event.preventDefault();
+                        console.log("click");
+                        console.log(parseInt(event.currentTarget.innerText) - 1);
                         _this.setExample(parseInt(event.currentTarget.innerText) - 1);
-                    });
-                });
-                Object.values(this.inputs).forEach(function (el) {
-                    return el.addEventListener("input", function (event) {
-                        return _this.onInputChange(event.currentTarget);
                     });
                 });
                 document
                     .querySelector(BUTTON_ID_RANDOM)
                     .addEventListener("click", function () { return _this.setRandom(); });
             };
-            Parser.registerGlobalMath = function () {
-                for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
-                    var key = _a[_i];
-                    if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
-                        // @ts-ignore
-                        window[key] = Math[key];
-                    }
-                }
+            Toolbar.prototype.setExample = function (exampleNumber) {
+                this.parser.overwrite(examples_1.examples[exampleNumber]);
             };
-            Parser.prototype.onInputChange = function (el) {
-                var _this = this;
-                if (this.inputTimeout !== undefined) {
-                    clearTimeout(this.inputTimeout);
-                }
-                this.inputTimeout = setTimeout(function () {
-                    if (!el || !el.id || !el.value) {
-                        return;
-                    }
-                    _this.paint();
-                }, constants_3.DEBOUNCE_TIMEOUT);
+            Toolbar.prototype.setRandom = function () {
+                this.parser.overwrite({
+                    red: this.randomizer.randomFunc(),
+                    green: this.randomizer.randomFunc(),
+                    blue: this.randomizer.randomFunc(),
+                    zoom: this.randomizer.randomZoom(),
+                });
             };
-            Parser.prototype.setRandom = function () {
-                for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
-                    var key = PaintInputNames_1[_i];
-                    this.inputs[key].value =
-                        key === "zoom"
-                            ? this.randomizer.randomZoom()
-                            : this.randomizer.randomFunc();
-                }
-                this.paint();
-            };
-            Parser.prototype.setExample = function (exampleNumber) {
-                var example = examples_1.examples[exampleNumber];
-                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
-                    var key = PaintInputNames_2[_i];
-                    this.inputs[key].value = example[key];
-                }
-                this.paint();
-            };
-            Parser.prototype.paint = function () {
-                var paintInputs;
-                try {
-                    paintInputs = this.buildPaintInputs();
-                }
-                catch (e) {
-                    console.error(e);
-                }
-                if (paintInputs) {
-                    this.painter.paint(paintInputs);
-                }
-            };
-            Parser.prototype.buildPaintInputs = function () {
-                return {
-                    red: Parser.buildColorFunc(this.inputs.red.value),
-                    green: Parser.buildColorFunc(this.inputs.green.value),
-                    blue: Parser.buildColorFunc(this.inputs.blue.value),
-                    zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
-                };
-            };
-            Parser.buildColorFunc = function (funcDescription) {
-                return new Function("x", "y", "return " + funcDescription + ";");
-            };
-            Parser.buildZoomFunc = function (funcDescription) {
-                return new Function("return " + funcDescription + ";");
-            };
-            return Parser;
+            return Toolbar;
         }());
-        exports.Parser = Parser;
+        exports.Toolbar = Toolbar;
     });
-    define("main", ["require", "exports", "Canvas", "Painter", "Parser"], function (require, exports, Canvas_1, Painter_1, Parser_1) {
+    define("main", ["require", "exports", "Canvas", "Painter", "Parser", "toolbar/Toolbar"], function (require, exports, Canvas_1, Painter_1, Parser_1, Toolbar_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         var Main = /** @class */ (function () {
@@ -455,9 +474,11 @@
                 this.canvas = new Canvas_1.Canvas();
                 this.painter = new Painter_1.Painter(this.canvas);
                 this.parser = new Parser_1.Parser(this.painter);
+                this.toolbar = new Toolbar_1.Toolbar(this.parser);
             }
             Main.prototype.run = function () {
-                this.parser.parse();
+                this.parser.activate();
+                this.toolbar.activate();
             };
             return Main;
         }());
