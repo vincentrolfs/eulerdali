@@ -19,24 +19,30 @@ export class Toolbar {
   }
 
   private showExampleOptions() {
-    document.getElementById(EXAMPLES_ID)!.innerHTML = examples
-      .map((_, index) => `<a href="#">${index + 1}</a>`)
-      .join(", ");
+    document.getElementById(EXAMPLES_ID)!.innerHTML =
+      `<option value="-1">&gt; Display example</option>` +
+      examples
+        .map(
+          (example, index) =>
+            `<option value="${index}">${example.name}</option>`
+        )
+        .join(", ");
   }
 
   private setEventListeners() {
-    document.querySelectorAll(`#${EXAMPLES_ID} a`).forEach((el) =>
-      el.addEventListener("click", (event) => {
-        event.preventDefault();
-        console.log("click");
-        console.log(
-          parseInt((event.currentTarget as HTMLAnchorElement).innerText) - 1
-        );
-        this.setExample(
-          parseInt((event.currentTarget as HTMLAnchorElement).innerText) - 1
-        );
-      })
-    );
+    document
+      .getElementById(EXAMPLES_ID)!
+      .addEventListener("change", (event) => {
+        const target = event.target as HTMLSelectElement | undefined;
+        const value = target?.value;
+
+        if (target === undefined || value === undefined || value === "-1") {
+          return;
+        }
+
+        this.setExample(parseInt(value));
+        target.value = "-1";
+      });
 
     document
       .querySelector(BUTTON_ID_RANDOM)!
