@@ -82,6 +82,13 @@ export const examples: Record<PaintInputName | "name", string>[] = [
     zoom: "1/5",
   },
   {
+    name: "Mondrian",
+    red: "(x > 1 && x < 2 && y > 3 && y < 4) ? 1 : 0",
+    green: "(x > -6 && x < -5 && y > 0 && y < 1) ? 1 : 0",
+    blue: "(x > 5 && x < 6 && y > -4 && y < -3) ? 1 : 0",
+    zoom: "1/10",
+  },
+  {
     name: "Pancake waves",
     red: "log(cos(y)-x/y)*4",
     green: "log(cos(y)-x/y)**4",

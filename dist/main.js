@@ -324,6 +324,13 @@
                 zoom: "1/5",
             },
             {
+                name: "Mondrian",
+                red: "(x > 1 && x < 2 && y > 3 && y < 4) ? 1 : 0",
+                green: "(x > -6 && x < -5 && y > 0 && y < 1) ? 1 : 0",
+                blue: "(x > 5 && x < 6 && y > -4 && y < -3) ? 1 : 0",
+                zoom: "1/10",
+            },
+            {
                 name: "Pancake waves",
                 red: "log(cos(y)-x/y)*4",
                 green: "log(cos(y)-x/y)**4",
@@ -490,17 +497,13 @@
                 });
             };
             Toolbar.prototype.share = function () {
-                var _a;
                 var url = this.getSharingUrl();
-                if (navigator.share) {
-                    return navigator.share({ url: url }).then(function () { return void 0; });
+                if (navigator && navigator.share) {
+                    return void navigator
+                        .share({ title: "Eulerdali artwork", url: url })
+                        .then(function () { return void 0; });
                 }
-                // @ts-ignore
-                if ((_a = navigator === null || navigator === void 0 ? void 0 : navigator.clipboard) === null || _a === void 0 ? void 0 : _a.writeText) {
-                    return navigator.clipboard
-                        .writeText(url)
-                        .then(function () { return alert("Copied URL to clipboard!"); });
-                }
+                return void window.prompt("Please copy the URL to share your art:", url);
             };
             Toolbar.prototype.getSharingUrl = function () {
                 var baseUrl = location.protocol + "//" + location.host + location.pathname + "?";

@@ -75,16 +75,13 @@ export class Toolbar {
   private share() {
     const url = this.getSharingUrl();
 
-    if (navigator.share) {
-      return navigator.share({ url }).then(() => void 0);
+    if (navigator && navigator.share) {
+      return void navigator
+        .share({ title: "Eulerdali artwork", url })
+        .then(() => void 0);
     }
 
-    // @ts-ignore
-    if (navigator?.clipboard?.writeText) {
-      return navigator.clipboard
-        .writeText(url)
-        .then(() => alert("Copied URL to clipboard!"));
-    }
+    return void window.prompt("Please copy the URL to share your art:", url);
   }
 
   private getSharingUrl() {
