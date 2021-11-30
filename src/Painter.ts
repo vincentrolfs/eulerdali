@@ -5,12 +5,10 @@ export class Painter {
   constructor(private readonly canvas: Canvas) {}
 
   paint(paintInputs: PaintInputs) {
-    const { width, height } = this.canvas;
-
     this.canvas.startJob();
 
     try {
-      this.paintAllBlocks(width, height, paintInputs);
+      this.paintAllPixel(paintInputs);
     } catch (e) {
       console.log(e);
       this.canvas.abortJob();
@@ -19,19 +17,17 @@ export class Painter {
     this.canvas.endJob();
   }
 
-  private paintAllBlocks(
-    width: number,
-    height: number,
-    paintInputs: PaintInputs
-  ) {
+  private paintAllPixel(paintInputs: PaintInputs) {
+    const { width, height } = this.canvas;
+
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        this.paintBlock(x, y, paintInputs);
+        this.paintPixel(x, y, paintInputs);
       }
     }
   }
 
-  private paintBlock(x: number, y: number, paintInputs: PaintInputs) {
+  private paintPixel(x: number, y: number, paintInputs: PaintInputs) {
     const color = this.computeColor(x, y, paintInputs);
     this.canvas.setPixel(x, y, color);
   }
