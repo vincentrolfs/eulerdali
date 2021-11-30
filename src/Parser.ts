@@ -40,11 +40,16 @@ export class Parser {
   }
 
   private static buildColorFunc(funcDescription: string): ColorFunc {
-    return new Function("x", "y", `return ${funcDescription};`) as ColorFunc;
+    return new Function(
+      "x",
+      "y",
+      "t",
+      `return ${funcDescription};`
+    ) as ColorFunc;
   }
 
   private static buildZoomFunc(funcDescription: string): ZoomFunc {
-    return new Function(`return ${funcDescription};`) as ZoomFunc;
+    return new Function("t", `return ${funcDescription};`) as ZoomFunc;
   }
 
   overwrite(values: Record<PaintInputName, string>) {

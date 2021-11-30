@@ -1,5 +1,5 @@
-export type ColorFunc = (x: number, y: number) => number;
-export type ZoomFunc = () => number;
+export type ColorFunc = (x: number, y: number, t: number) => number;
+export type ZoomFunc = (t: number) => number;
 
 export const PaintInputNames = ["red", "green", "blue", "zoom"] as const;
 export type PaintInputName = typeof PaintInputNames[number];

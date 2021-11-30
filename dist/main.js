@@ -94,9 +94,10 @@
             function Painter(canvas) {
                 this.canvas = canvas;
             }
-            Painter.prototype.createPainting = function (paintInputs) {
+            Painter.prototype.createPainting = function (paintInputs, t) {
+                if (t === void 0) { t = 0; }
                 var painting = new Painting_1.Painting(this.canvas);
-                this.paintAllPixel(painting, paintInputs);
+                this.paintAllPixel(painting, paintInputs, t);
                 return painting;
             };
             Painter.prototype.paint = function (paintInputs) {
@@ -109,37 +110,37 @@
                     painting.apply();
                 }
             };
-            Painter.prototype.paintAllPixel = function (painting, paintInputs) {
+            Painter.prototype.paintAllPixel = function (painting, paintInputs, t) {
                 var _a = this.canvas, width = _a.width, height = _a.height;
                 for (var x = 0; x < width; x++) {
                     for (var y = 0; y < height; y++) {
-                        this.paintPixel(painting, x, y, paintInputs);
+                        this.paintPixel(painting, x, y, t, paintInputs);
                     }
                 }
             };
-            Painter.prototype.paintPixel = function (painting, x, y, paintInputs) {
-                var color = this.computeColor(x, y, paintInputs);
+            Painter.prototype.paintPixel = function (painting, x, y, t, paintInputs) {
+                var color = this.computeColor(x, y, t, paintInputs);
                 painting.setPixel(x, y, color);
             };
-            Painter.prototype.computeColor = function (xAbsolute, yAbsolute, paintInputs) {
-                var _a = this.computeRelativeCoordinates(xAbsolute, yAbsolute, paintInputs.zoom), x = _a[0], y = _a[1];
-                var red = Painter.computeColorComponent(x, y, paintInputs.red);
-                var green = Painter.computeColorComponent(x, y, paintInputs.green);
-                var blue = Painter.computeColorComponent(x, y, paintInputs.blue);
+            Painter.prototype.computeColor = function (xAbsolute, yAbsolute, t, paintInputs) {
+                var _a = this.computeRelativeCoordinates(xAbsolute, yAbsolute, t, paintInputs.zoom), x = _a[0], y = _a[1];
+                var red = Painter.computeColorComponent(x, y, t, paintInputs.red);
+                var green = Painter.computeColorComponent(x, y, t, paintInputs.green);
+                var blue = Painter.computeColorComponent(x, y, t, paintInputs.blue);
                 return [red, green, blue];
             };
-            Painter.prototype.computeRelativeCoordinates = function (xAbsolute, yAbsolute, zoom) {
-                var scale = zoom() * Math.min(this.canvas.width, this.canvas.height);
+            Painter.prototype.computeRelativeCoordinates = function (xAbsolute, yAbsolute, t, zoom) {
+                var scale = zoom(t) * Math.min(this.canvas.width, this.canvas.height);
                 return [
                     (2 * xAbsolute - this.canvas.width) / scale,
                     (2 * yAbsolute - this.canvas.height) / scale,
                 ];
             };
-            Painter.computeColorComponent = function (x, y, func) {
-                return Painter.capNumber(255 * Math.abs(Painter.getFuncResult(x, y, func)));
+            Painter.computeColorComponent = function (x, y, t, func) {
+                return Painter.capNumber(255 * Math.abs(Painter.getFuncResult(x, y, t, func)));
             };
-            Painter.getFuncResult = function (x, y, func) {
-                return func(x, y) || 0;
+            Painter.getFuncResult = function (x, y, t, func) {
+                return func(x, y, t) || 0;
             };
             Painter.capNumber = function (num) {
                 return Math.max(0, Math.min(255, Math.round(num || 0)));
@@ -177,10 +178,10 @@
                 }
             };
             Parser.buildColorFunc = function (funcDescription) {
-                return new Function("x", "y", "return " + funcDescription + ";");
+                return new Function("x", "y", "t", "return " + funcDescription + ";");
             };
             Parser.buildZoomFunc = function (funcDescription) {
-                return new Function("return " + funcDescription + ";");
+                return new Function("t", "return " + funcDescription + ";");
             };
             Parser.prototype.overwrite = function (values) {
                 for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
