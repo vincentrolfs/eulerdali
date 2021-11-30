@@ -1,35 +1,48 @@
 import { Canvas } from "./Canvas";
 import { ColorFunc, PaintInputs, ZoomFunc } from "./common/utilities";
+import { Painting } from "./Painting";
 
 export class Painter {
   constructor(private readonly canvas: Canvas) {}
 
-  paint(paintInputs: PaintInputs) {
-    this.canvas.startJob();
+  createPainting(paintInputs: PaintInputs) {
+    const painting = new Painting(this.canvas);
 
-    try {
-      this.paintAllPixel(paintInputs);
-    } catch (e) {
-      console.log(e);
-      this.canvas.abortJob();
-    }
+    this.paintAllPixel(painting, paintInputs);
 
-    this.canvas.endJob();
+    return painting;
   }
 
-  private paintAllPixel(paintInputs: PaintInputs) {
+  paint(paintInputs: PaintInputs) {
+    let painting;
+
+    try {
+      painting = this.createPainting(paintInputs);
+    } catch (e) {}
+
+    if (painting) {
+      painting.apply();
+    }
+  }
+
+  private paintAllPixel(painting: Painting, paintInputs: PaintInputs) {
     const { width, height } = this.canvas;
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        this.paintPixel(x, y, paintInputs);
+        this.paintPixel(painting, x, y, paintInputs);
       }
     }
   }
 
-  private paintPixel(x: number, y: number, paintInputs: PaintInputs) {
+  private paintPixel(
+    painting: Painting,
+    x: number,
+    y: number,
+    paintInputs: PaintInputs
+  ) {
     const color = this.computeColor(x, y, paintInputs);
-    this.canvas.setPixel(x, y, color);
+    painting.setPixel(x, y, color);
   }
 
   private computeColor(

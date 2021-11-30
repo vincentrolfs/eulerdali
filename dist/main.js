@@ -45,35 +45,8 @@
                 enumerable: false,
                 configurable: true
             });
-            Canvas.prototype.setPixel = function (x, y, color) {
-                if (!this.pendingImageData) {
-                    throw new Error("No job has been started.");
-                }
-                var redIndex = y * (this.element.width * 4) + x * 4;
-                var greenIndex = redIndex + 1;
-                var blueIndex = redIndex + 2;
-                var alphaIndex = redIndex + 3;
-                var red = color[0], green = color[1], blue = color[2];
-                this.pendingImageData.data[redIndex] = red;
-                this.pendingImageData.data[greenIndex] = green;
-                this.pendingImageData.data[blueIndex] = blue;
-                this.pendingImageData.data[alphaIndex] = 255;
-            };
-            Canvas.prototype.startJob = function () {
-                this.pendingImageData = new ImageData(this.element.width, this.element.height);
-            };
-            Canvas.prototype.abortJob = function () {
-                if (!this.pendingImageData) {
-                    throw new Error("abortJob called, but no job has been started.");
-                }
-                this.pendingImageData = undefined;
-            };
-            Canvas.prototype.endJob = function () {
-                if (!this.pendingImageData) {
-                    throw new Error("endJob called, but no job has been started.");
-                }
-                this.ctx.putImageData(this.pendingImageData, 0, 0);
-                this.pendingImageData = undefined;
+            Canvas.prototype.putImageData = function (imageData) {
+                this.ctx.putImageData(imageData, 0, 0);
             };
             return Canvas;
         }());
@@ -86,7 +59,34 @@
         exports.PaintInputNames = ["red", "green", "blue", "zoom"];
         var __ensure_subtype = function (x) { return x; };
     });
-    define("Painter", ["require", "exports"], function (require, exports) {
+    define("Painting", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.Painting = void 0;
+        var Painting = /** @class */ (function () {
+            function Painting(canvas) {
+                this.canvas = canvas;
+                this.imageData = new ImageData(canvas.width, canvas.height);
+            }
+            Painting.prototype.setPixel = function (x, y, color) {
+                var redIndex = y * (this.canvas.width * 4) + x * 4;
+                var greenIndex = redIndex + 1;
+                var blueIndex = redIndex + 2;
+                var alphaIndex = redIndex + 3;
+                var red = color[0], green = color[1], blue = color[2];
+                this.imageData.data[redIndex] = red;
+                this.imageData.data[greenIndex] = green;
+                this.imageData.data[blueIndex] = blue;
+                this.imageData.data[alphaIndex] = 255;
+            };
+            Painting.prototype.apply = function () {
+                this.canvas.putImageData(this.imageData);
+            };
+            return Painting;
+        }());
+        exports.Painting = Painting;
+    });
+    define("Painter", ["require", "exports", "Painting"], function (require, exports, Painting_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Painter = void 0;
@@ -94,28 +94,32 @@
             function Painter(canvas) {
                 this.canvas = canvas;
             }
-            Painter.prototype.paint = function (paintInputs) {
-                this.canvas.startJob();
-                try {
-                    this.paintAllPixel(paintInputs);
-                }
-                catch (e) {
-                    console.log(e);
-                    this.canvas.abortJob();
-                }
-                this.canvas.endJob();
+            Painter.prototype.createPainting = function (paintInputs) {
+                var painting = new Painting_1.Painting(this.canvas);
+                this.paintAllPixel(painting, paintInputs);
+                return painting;
             };
-            Painter.prototype.paintAllPixel = function (paintInputs) {
+            Painter.prototype.paint = function (paintInputs) {
+                var painting;
+                try {
+                    painting = this.createPainting(paintInputs);
+                }
+                catch (e) { }
+                if (painting) {
+                    painting.apply();
+                }
+            };
+            Painter.prototype.paintAllPixel = function (painting, paintInputs) {
                 var _a = this.canvas, width = _a.width, height = _a.height;
                 for (var x = 0; x < width; x++) {
                     for (var y = 0; y < height; y++) {
-                        this.paintPixel(x, y, paintInputs);
+                        this.paintPixel(painting, x, y, paintInputs);
                     }
                 }
             };
-            Painter.prototype.paintPixel = function (x, y, paintInputs) {
+            Painter.prototype.paintPixel = function (painting, x, y, paintInputs) {
                 var color = this.computeColor(x, y, paintInputs);
-                this.canvas.setPixel(x, y, color);
+                painting.setPixel(x, y, color);
             };
             Painter.prototype.computeColor = function (xAbsolute, yAbsolute, paintInputs) {
                 var _a = this.computeRelativeCoordinates(xAbsolute, yAbsolute, paintInputs.zoom), x = _a[0], y = _a[1];
