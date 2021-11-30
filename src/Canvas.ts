@@ -44,9 +44,7 @@ export class Canvas {
   }
 
   startJob() {
-    this.pendingImageData = this.ctx.getImageData(
-      0,
-      0,
+    this.pendingImageData = new ImageData(
       this.element.width,
       this.element.height
     );
