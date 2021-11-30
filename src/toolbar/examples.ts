@@ -10,6 +10,13 @@ export const examples: Record<PaintInputName | "name", string>[] = [
     zoom: "1/2",
   },
   {
+    name: "Simple example",
+    red: "x",
+    green: "y",
+    blue: "x+y",
+    zoom: "1",
+  },
+  {
     name: "Waterfunk",
     red: "1/(sin(x**2 + y**2) + 2*cos(x*y))",
     green: "1/(sin(x**2 + (y+PI)**2) - 3*cos(x*y))",
@@ -22,13 +29,6 @@ export const examples: Record<PaintInputName | "name", string>[] = [
     green: "cos(1 / log(tan(x) + 1 / sin(y)))",
     blue: "tan(1 / log(sin(x) + 1 / cos(y)))",
     zoom: "1/4",
-  },
-  {
-    name: "Soft strokes",
-    red: "x",
-    green: "y",
-    blue: "x+y",
-    zoom: "1",
   },
   {
     name: "Spiral",

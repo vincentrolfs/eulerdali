@@ -60,7 +60,7 @@
                 this.pendingImageData.data[alphaIndex] = 255;
             };
             Canvas.prototype.startJob = function () {
-                this.pendingImageData = this.ctx.getImageData(0, 0, this.element.width, this.element.height);
+                this.pendingImageData = new ImageData(this.element.width, this.element.height);
             };
             Canvas.prototype.abortJob = function () {
                 if (!this.pendingImageData) {
@@ -95,10 +95,9 @@
                 this.canvas = canvas;
             }
             Painter.prototype.paint = function (paintInputs) {
-                var _a = this.canvas, width = _a.width, height = _a.height;
                 this.canvas.startJob();
                 try {
-                    this.paintAllBlocks(width, height, paintInputs);
+                    this.paintAllPixel(paintInputs);
                 }
                 catch (e) {
                     console.log(e);
@@ -106,14 +105,15 @@
                 }
                 this.canvas.endJob();
             };
-            Painter.prototype.paintAllBlocks = function (width, height, paintInputs) {
+            Painter.prototype.paintAllPixel = function (paintInputs) {
+                var _a = this.canvas, width = _a.width, height = _a.height;
                 for (var x = 0; x < width; x++) {
                     for (var y = 0; y < height; y++) {
-                        this.paintBlock(x, y, paintInputs);
+                        this.paintPixel(x, y, paintInputs);
                     }
                 }
             };
-            Painter.prototype.paintBlock = function (x, y, paintInputs) {
+            Painter.prototype.paintPixel = function (x, y, paintInputs) {
                 var color = this.computeColor(x, y, paintInputs);
                 this.canvas.setPixel(x, y, color);
             };
@@ -254,6 +254,13 @@
                 zoom: "1/2",
             },
             {
+                name: "Simple example",
+                red: "x",
+                green: "y",
+                blue: "x+y",
+                zoom: "1",
+            },
+            {
                 name: "Waterfunk",
                 red: "1/(sin(x**2 + y**2) + 2*cos(x*y))",
                 green: "1/(sin(x**2 + (y+PI)**2) - 3*cos(x*y))",
@@ -266,13 +273,6 @@
                 green: "cos(1 / log(tan(x) + 1 / sin(y)))",
                 blue: "tan(1 / log(sin(x) + 1 / cos(y)))",
                 zoom: "1/4",
-            },
-            {
-                name: "Soft strokes",
-                red: "x",
-                green: "y",
-                blue: "x+y",
-                zoom: "1",
             },
             {
                 name: "Spiral",
