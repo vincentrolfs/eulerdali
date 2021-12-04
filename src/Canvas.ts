@@ -3,7 +3,6 @@ const CANVAS_ID = "canvas";
 export class Canvas {
   private element: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private pendingImageData: ImageData | undefined;
 
   constructor() {
     this.element = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
