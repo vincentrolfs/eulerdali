@@ -1,6 +1,5 @@
 import { Canvas } from "./Canvas";
 import { Painter } from "./Painter";
-import { Parser } from "./toolbar/Parser";
 import { Toolbar } from "./toolbar/Toolbar";
 
 class Main {

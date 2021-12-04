@@ -1,4 +1,4 @@
-import { Parser } from "./Parser";
+import { InputHandler } from "./InputHandler";
 import { EXAMPLES_ID } from "../common/constants";
 import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
@@ -14,17 +14,17 @@ const HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
 
 export class Toolbar {
   private readonly randomizer: Randomizer;
-  private readonly parser: Parser;
+  private readonly inputHandler: InputHandler;
   private readonly animator: Animator;
 
   constructor(private readonly painter: Painter) {
     this.randomizer = new Randomizer();
-    this.parser = new Parser(painter);
+    this.inputHandler = new InputHandler(painter);
     this.animator = new Animator(painter);
   }
 
   activate() {
-    this.parser.activate();
+    this.inputHandler.listen();
     this.showExampleOptions();
     this.setEventListeners();
     this.setExample(initialExample);
@@ -67,11 +67,11 @@ export class Toolbar {
   }
 
   private setExample(exampleNumber: number) {
-    this.parser.overwrite(examples[exampleNumber]);
+    this.inputHandler.overwrite(examples[exampleNumber]);
   }
 
   private setRandom() {
-    this.parser.overwrite({
+    this.inputHandler.overwrite({
       red: this.randomizer.randomFunc(),
       green: this.randomizer.randomFunc(),
       blue: this.randomizer.randomFunc(),
@@ -94,7 +94,7 @@ export class Toolbar {
   private getSharingUrl() {
     const baseUrl =
       location.protocol + "//" + location.host + location.pathname + "?";
-    const formulas = this.parser.getFormulas();
+    const formulas = this.inputHandler.getFormulas();
     const encodedFormulas = [];
 
     for (const key of PaintInputNames) {

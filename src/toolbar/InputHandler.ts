@@ -15,7 +15,7 @@ const INPUT_ID_ZOOM = "#input-zoom";
 
 type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
 
-export class Parser {
+export class InputHandler {
   private readonly inputs: InputMap;
   private inputTimeout: number | undefined;
 
@@ -27,10 +27,10 @@ export class Parser {
       zoom: document.querySelector(INPUT_ID_ZOOM)!,
     };
 
-    Parser.registerGlobalMath();
+    InputHandler.registerGlobalMath();
   }
 
-  activate() {
+  listen() {
     this.setEventListeners();
   }
 
@@ -111,10 +111,10 @@ export class Parser {
 
   private buildPaintInputs(): PaintInputs {
     return {
-      red: Parser.buildColorFunc(this.inputs.red.value),
-      green: Parser.buildColorFunc(this.inputs.green.value),
-      blue: Parser.buildColorFunc(this.inputs.blue.value),
-      zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
+      red: InputHandler.buildColorFunc(this.inputs.red.value),
+      green: InputHandler.buildColorFunc(this.inputs.green.value),
+      blue: InputHandler.buildColorFunc(this.inputs.blue.value),
+      zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
     };
   }
 }

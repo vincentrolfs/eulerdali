@@ -149,16 +149,16 @@
         }());
         exports.Painter = Painter;
     });
-    define("toolbar/Parser", ["require", "exports", "common/utilities", "common/constants"], function (require, exports, utilities_1, constants_2) {
+    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/constants"], function (require, exports, utilities_1, constants_2) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        exports.Parser = void 0;
+        exports.InputHandler = void 0;
         var INPUT_ID_RED = "#input-red";
         var INPUT_ID_GREEN = "#input-green";
         var INPUT_ID_BLUE = "#input-blue";
         var INPUT_ID_ZOOM = "#input-zoom";
-        var Parser = /** @class */ (function () {
-            function Parser(painter) {
+        var InputHandler = /** @class */ (function () {
+            function InputHandler(painter) {
                 this.painter = painter;
                 this.inputs = {
                     red: document.querySelector(INPUT_ID_RED),
@@ -166,19 +166,19 @@
                     blue: document.querySelector(INPUT_ID_BLUE),
                     zoom: document.querySelector(INPUT_ID_ZOOM),
                 };
-                Parser.registerGlobalMath();
+                InputHandler.registerGlobalMath();
             }
-            Parser.prototype.activate = function () {
+            InputHandler.prototype.listen = function () {
                 this.setEventListeners();
             };
-            Parser.prototype.overwrite = function (values) {
+            InputHandler.prototype.overwrite = function (values) {
                 for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
                     var key = PaintInputNames_1[_i];
                     this.inputs[key].value = values[key];
                 }
                 this.paint();
             };
-            Parser.prototype.getFormulas = function () {
+            InputHandler.prototype.getFormulas = function () {
                 return {
                     red: this.inputs.red.value,
                     green: this.inputs.green.value,
@@ -186,7 +186,7 @@
                     zoom: this.inputs.zoom.value,
                 };
             };
-            Parser.registerGlobalMath = function () {
+            InputHandler.registerGlobalMath = function () {
                 for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
                     var key = _a[_i];
                     if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
@@ -195,13 +195,13 @@
                     }
                 }
             };
-            Parser.buildColorFunc = function (funcDescription) {
+            InputHandler.buildColorFunc = function (funcDescription) {
                 return new Function("x", "y", "t", "return " + funcDescription + ";");
             };
-            Parser.buildZoomFunc = function (funcDescription) {
+            InputHandler.buildZoomFunc = function (funcDescription) {
                 return new Function("t", "return " + funcDescription + ";");
             };
-            Parser.prototype.setEventListeners = function () {
+            InputHandler.prototype.setEventListeners = function () {
                 var _this = this;
                 Object.values(this.inputs).forEach(function (el) {
                     return el.addEventListener("input", function (event) {
@@ -209,7 +209,7 @@
                     });
                 });
             };
-            Parser.prototype.onInputChange = function (el) {
+            InputHandler.prototype.onInputChange = function (el) {
                 var _this = this;
                 if (this.inputTimeout !== undefined) {
                     clearTimeout(this.inputTimeout);
@@ -221,7 +221,7 @@
                     _this.paint();
                 }, constants_2.DEBOUNCE_TIMEOUT);
             };
-            Parser.prototype.paint = function () {
+            InputHandler.prototype.paint = function () {
                 var paintInputs;
                 try {
                     paintInputs = this.buildPaintInputs();
@@ -233,17 +233,17 @@
                     this.painter.paint(paintInputs);
                 }
             };
-            Parser.prototype.buildPaintInputs = function () {
+            InputHandler.prototype.buildPaintInputs = function () {
                 return {
-                    red: Parser.buildColorFunc(this.inputs.red.value),
-                    green: Parser.buildColorFunc(this.inputs.green.value),
-                    blue: Parser.buildColorFunc(this.inputs.blue.value),
-                    zoom: Parser.buildZoomFunc(this.inputs.zoom.value),
+                    red: InputHandler.buildColorFunc(this.inputs.red.value),
+                    green: InputHandler.buildColorFunc(this.inputs.green.value),
+                    blue: InputHandler.buildColorFunc(this.inputs.blue.value),
+                    zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
                 };
             };
-            return Parser;
+            return InputHandler;
         }());
-        exports.Parser = Parser;
+        exports.InputHandler = InputHandler;
     });
     define("toolbar/examples", ["require", "exports"], function (require, exports) {
         "use strict";
@@ -483,7 +483,7 @@
         }());
         exports.Animator = Animator;
     });
-    define("toolbar/Toolbar", ["require", "exports", "toolbar/Parser", "common/constants", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, Parser_1, constants_4, examples_1, Randomizer_1, utilities_2, Animator_1) {
+    define("toolbar/Toolbar", ["require", "exports", "toolbar/InputHandler", "common/constants", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, InputHandler_1, constants_4, examples_1, Randomizer_1, utilities_2, Animator_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Toolbar = void 0;
@@ -495,11 +495,11 @@
             function Toolbar(painter) {
                 this.painter = painter;
                 this.randomizer = new Randomizer_1.Randomizer();
-                this.parser = new Parser_1.Parser(painter);
+                this.inputHandler = new InputHandler_1.InputHandler(painter);
                 this.animator = new Animator_1.Animator(painter);
             }
             Toolbar.prototype.activate = function () {
-                this.parser.activate();
+                this.inputHandler.listen();
                 this.showExampleOptions();
                 this.setEventListeners();
                 this.setExample(examples_1.initialExample);
@@ -533,10 +533,10 @@
                     .addEventListener("click", function () { return window.open(HELP_URL, "_blank"); });
             };
             Toolbar.prototype.setExample = function (exampleNumber) {
-                this.parser.overwrite(examples_1.examples[exampleNumber]);
+                this.inputHandler.overwrite(examples_1.examples[exampleNumber]);
             };
             Toolbar.prototype.setRandom = function () {
-                this.parser.overwrite({
+                this.inputHandler.overwrite({
                     red: this.randomizer.randomFunc(),
                     green: this.randomizer.randomFunc(),
                     blue: this.randomizer.randomFunc(),
@@ -554,7 +554,7 @@
             };
             Toolbar.prototype.getSharingUrl = function () {
                 var baseUrl = location.protocol + "//" + location.host + location.pathname + "?";
-                var formulas = this.parser.getFormulas();
+                var formulas = this.inputHandler.getFormulas();
                 var encodedFormulas = [];
                 for (var _i = 0, PaintInputNames_2 = utilities_2.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
                     var key = PaintInputNames_2[_i];
