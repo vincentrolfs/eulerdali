@@ -7,6 +7,7 @@ import {
   ZoomFunc,
 } from "../common/utilities";
 import { DEBOUNCE_TIMEOUT } from "../common/settings";
+import { examples, initialExample } from "./examples";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
@@ -28,10 +29,16 @@ export class InputHandler {
     };
 
     InputHandler.registerGlobalMath();
+
+    this.setInitial();
   }
 
-  listen() {
-    this.setEventListeners();
+  setEventListeners() {
+    Object.values(this.inputs).forEach((el) =>
+      el.addEventListener("input", (event) =>
+        this.onInputChange(event.currentTarget as HTMLInputElement | null)
+      )
+    );
   }
 
   overwrite(values: Record<PaintInputName, string>) {
@@ -73,12 +80,8 @@ export class InputHandler {
     return new Function("t", `return ${funcDescription};`) as ZoomFunc;
   }
 
-  private setEventListeners() {
-    Object.values(this.inputs).forEach((el) =>
-      el.addEventListener("input", (event) =>
-        this.onInputChange(event.currentTarget as HTMLInputElement | null)
-      )
-    );
+  private setInitial() {
+    this.overwrite(examples[initialExample]);
   }
 
   private onInputChange(el: HTMLInputElement | null) {

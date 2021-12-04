@@ -151,111 +151,6 @@
         exports.RANDOMIZER_MIN_DEPTH = 1;
         exports.RANDOMIZER_MAX_DEPTH = 6;
     });
-    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/settings"], function (require, exports, utilities_1, settings_1) {
-        "use strict";
-        Object.defineProperty(exports, "__esModule", { value: true });
-        exports.InputHandler = void 0;
-        var INPUT_ID_RED = "#input-red";
-        var INPUT_ID_GREEN = "#input-green";
-        var INPUT_ID_BLUE = "#input-blue";
-        var INPUT_ID_ZOOM = "#input-zoom";
-        var InputHandler = /** @class */ (function () {
-            function InputHandler(painter) {
-                this.painter = painter;
-                this.inputs = {
-                    red: document.querySelector(INPUT_ID_RED),
-                    green: document.querySelector(INPUT_ID_GREEN),
-                    blue: document.querySelector(INPUT_ID_BLUE),
-                    zoom: document.querySelector(INPUT_ID_ZOOM),
-                };
-                InputHandler.registerGlobalMath();
-            }
-            InputHandler.prototype.listen = function () {
-                this.setEventListeners();
-            };
-            InputHandler.prototype.overwrite = function (values) {
-                for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
-                    var key = PaintInputNames_1[_i];
-                    this.inputs[key].value = values[key];
-                }
-                this.paint();
-            };
-            InputHandler.prototype.getFormulas = function () {
-                return {
-                    red: this.inputs.red.value,
-                    green: this.inputs.green.value,
-                    blue: this.inputs.blue.value,
-                    zoom: this.inputs.zoom.value,
-                };
-            };
-            InputHandler.registerGlobalMath = function () {
-                for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
-                    var key = _a[_i];
-                    if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
-                        // @ts-ignore
-                        window[key] = Math[key];
-                    }
-                }
-            };
-            InputHandler.buildColorFunc = function (funcDescription) {
-                return new Function("x", "y", "t", "return " + funcDescription + ";");
-            };
-            InputHandler.buildZoomFunc = function (funcDescription) {
-                return new Function("t", "return " + funcDescription + ";");
-            };
-            InputHandler.prototype.setEventListeners = function () {
-                var _this = this;
-                Object.values(this.inputs).forEach(function (el) {
-                    return el.addEventListener("input", function (event) {
-                        return _this.onInputChange(event.currentTarget);
-                    });
-                });
-            };
-            InputHandler.prototype.onInputChange = function (el) {
-                var _this = this;
-                if (this.inputTimeout !== undefined) {
-                    clearTimeout(this.inputTimeout);
-                }
-                this.inputTimeout = setTimeout(function () {
-                    if (!el || !el.id || !el.value) {
-                        return;
-                    }
-                    _this.paint();
-                }, settings_1.DEBOUNCE_TIMEOUT);
-            };
-            InputHandler.prototype.paint = function () {
-                var paintInputs;
-                var success = true;
-                try {
-                    paintInputs = this.buildPaintInputs();
-                }
-                catch (e) {
-                    success = false;
-                }
-                if (paintInputs) {
-                    success = success && this.painter.paint(paintInputs);
-                }
-                this.setSuccessState(success);
-            };
-            InputHandler.prototype.buildPaintInputs = function () {
-                return {
-                    red: InputHandler.buildColorFunc(this.inputs.red.value),
-                    green: InputHandler.buildColorFunc(this.inputs.green.value),
-                    blue: InputHandler.buildColorFunc(this.inputs.blue.value),
-                    zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
-                };
-            };
-            InputHandler.prototype.setSuccessState = function (success) {
-                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
-                    var key = PaintInputNames_2[_i];
-                    var classes = this.inputs[key].classList;
-                    success ? classes.remove("error") : classes.add("error");
-                }
-            };
-            return InputHandler;
-        }());
-        exports.InputHandler = InputHandler;
-    });
     define("toolbar/examples", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
@@ -361,6 +256,112 @@
                 zoom: "1/9",
             },
         ];
+    });
+    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/settings", "toolbar/examples"], function (require, exports, utilities_1, settings_1, examples_1) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.InputHandler = void 0;
+        var INPUT_ID_RED = "#input-red";
+        var INPUT_ID_GREEN = "#input-green";
+        var INPUT_ID_BLUE = "#input-blue";
+        var INPUT_ID_ZOOM = "#input-zoom";
+        var InputHandler = /** @class */ (function () {
+            function InputHandler(painter) {
+                this.painter = painter;
+                this.inputs = {
+                    red: document.querySelector(INPUT_ID_RED),
+                    green: document.querySelector(INPUT_ID_GREEN),
+                    blue: document.querySelector(INPUT_ID_BLUE),
+                    zoom: document.querySelector(INPUT_ID_ZOOM),
+                };
+                InputHandler.registerGlobalMath();
+                this.setInitial();
+            }
+            InputHandler.prototype.setEventListeners = function () {
+                var _this = this;
+                Object.values(this.inputs).forEach(function (el) {
+                    return el.addEventListener("input", function (event) {
+                        return _this.onInputChange(event.currentTarget);
+                    });
+                });
+            };
+            InputHandler.prototype.overwrite = function (values) {
+                for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
+                    var key = PaintInputNames_1[_i];
+                    this.inputs[key].value = values[key];
+                }
+                this.paint();
+            };
+            InputHandler.prototype.getFormulas = function () {
+                return {
+                    red: this.inputs.red.value,
+                    green: this.inputs.green.value,
+                    blue: this.inputs.blue.value,
+                    zoom: this.inputs.zoom.value,
+                };
+            };
+            InputHandler.registerGlobalMath = function () {
+                for (var _i = 0, _a = Object.getOwnPropertyNames(Math); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
+                        // @ts-ignore
+                        window[key] = Math[key];
+                    }
+                }
+            };
+            InputHandler.buildColorFunc = function (funcDescription) {
+                return new Function("x", "y", "t", "return " + funcDescription + ";");
+            };
+            InputHandler.buildZoomFunc = function (funcDescription) {
+                return new Function("t", "return " + funcDescription + ";");
+            };
+            InputHandler.prototype.setInitial = function () {
+                this.overwrite(examples_1.examples[examples_1.initialExample]);
+            };
+            InputHandler.prototype.onInputChange = function (el) {
+                var _this = this;
+                if (this.inputTimeout !== undefined) {
+                    clearTimeout(this.inputTimeout);
+                }
+                this.inputTimeout = setTimeout(function () {
+                    if (!el || !el.id || !el.value) {
+                        return;
+                    }
+                    _this.paint();
+                }, settings_1.DEBOUNCE_TIMEOUT);
+            };
+            InputHandler.prototype.paint = function () {
+                var paintInputs;
+                var success = true;
+                try {
+                    paintInputs = this.buildPaintInputs();
+                }
+                catch (e) {
+                    success = false;
+                }
+                if (paintInputs) {
+                    success = success && this.painter.paint(paintInputs);
+                }
+                this.setSuccessState(success);
+            };
+            InputHandler.prototype.buildPaintInputs = function () {
+                return {
+                    red: InputHandler.buildColorFunc(this.inputs.red.value),
+                    green: InputHandler.buildColorFunc(this.inputs.green.value),
+                    blue: InputHandler.buildColorFunc(this.inputs.blue.value),
+                    zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
+                };
+            };
+            InputHandler.prototype.setSuccessState = function (success) {
+                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
+                    var key = PaintInputNames_2[_i];
+                    var classes = this.inputs[key].classList;
+                    success ? classes.remove("error") : classes.add("error");
+                }
+            };
+            return InputHandler;
+        }());
+        exports.InputHandler = InputHandler;
     });
     define("toolbar/Randomizer", ["require", "exports", "common/settings"], function (require, exports, settings_2) {
         "use strict";
@@ -494,7 +495,7 @@
         }());
         exports.Animator = Animator;
     });
-    define("toolbar/Toolbar", ["require", "exports", "toolbar/InputHandler", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, InputHandler_1, examples_1, Randomizer_1, utilities_2, Animator_1) {
+    define("toolbar/Toolbar", ["require", "exports", "toolbar/InputHandler", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, InputHandler_1, examples_2, Randomizer_1, utilities_2, Animator_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Toolbar = void 0;
@@ -513,15 +514,14 @@
                 this.randomizer = new Randomizer_1.Randomizer();
                 this.inputHandler = new InputHandler_1.InputHandler(painter);
                 this.animator = new Animator_1.Animator(painter);
+                this.showExampleOptions();
             }
             Toolbar.prototype.activate = function () {
-                this.inputHandler.listen();
-                this.showExampleOptions();
                 this.setEventListeners();
-                this.setExample(examples_1.initialExample);
+                this.inputHandler.setEventListeners();
             };
             Toolbar.prototype.showExampleOptions = function () {
-                document.getElementById(EXAMPLES_ID).innerHTML += examples_1.examples
+                document.getElementById(EXAMPLES_ID).innerHTML += examples_2.examples
                     .map(function (example, index) { return "<option value=\"" + index + "\">" + example.name + "</option>"; })
                     .join(", ");
             };
@@ -561,7 +561,7 @@
                 });
             };
             Toolbar.prototype.setExample = function (exampleNumber) {
-                this.inputHandler.overwrite(examples_1.examples[exampleNumber]);
+                this.inputHandler.overwrite(examples_2.examples[exampleNumber]);
             };
             Toolbar.prototype.setRandom = function () {
                 this.inputHandler.overwrite({

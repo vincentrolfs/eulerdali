@@ -27,13 +27,13 @@ export class Toolbar {
     this.randomizer = new Randomizer();
     this.inputHandler = new InputHandler(painter);
     this.animator = new Animator(painter);
+
+    this.showExampleOptions();
   }
 
   activate() {
-    this.inputHandler.listen();
-    this.showExampleOptions();
     this.setEventListeners();
-    this.setExample(initialExample);
+    this.inputHandler.setEventListeners();
   }
 
   private showExampleOptions() {
