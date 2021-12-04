@@ -96,10 +96,13 @@
                 try {
                     painting = this.createPainting(paintInputs);
                 }
-                catch (e) { }
+                catch (e) {
+                    return false;
+                }
                 if (painting) {
                     painting.apply();
                 }
+                return true;
             };
             Painter.prototype.paintAllPixel = function (painting, paintInputs, t) {
                 var _a = this.canvas, width = _a.width, height = _a.height;
@@ -222,15 +225,17 @@
             };
             InputHandler.prototype.paint = function () {
                 var paintInputs;
+                var success = true;
                 try {
                     paintInputs = this.buildPaintInputs();
                 }
                 catch (e) {
-                    console.error(e);
+                    success = false;
                 }
                 if (paintInputs) {
-                    this.painter.paint(paintInputs);
+                    success = success && this.painter.paint(paintInputs);
                 }
+                this.setSuccessState(success);
             };
             InputHandler.prototype.buildPaintInputs = function () {
                 return {
@@ -239,6 +244,13 @@
                     blue: InputHandler.buildColorFunc(this.inputs.blue.value),
                     zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
                 };
+            };
+            InputHandler.prototype.setSuccessState = function (success) {
+                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
+                    var key = PaintInputNames_2[_i];
+                    var classes = this.inputs[key].classList;
+                    success ? classes.remove("error") : classes.add("error");
+                }
             };
             return InputHandler;
         }());
@@ -572,8 +584,8 @@
                 var baseUrl = location.protocol + "//" + location.host + location.pathname + "?";
                 var formulas = this.inputHandler.getFormulas();
                 var encodedFormulas = [];
-                for (var _i = 0, PaintInputNames_2 = utilities_2.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
-                    var key = PaintInputNames_2[_i];
+                for (var _i = 0, PaintInputNames_3 = utilities_2.PaintInputNames; _i < PaintInputNames_3.length; _i++) {
+                    var key = PaintInputNames_3[_i];
                     encodedFormulas.push(key + "=" + encodeURIComponent(formulas[key]));
                 }
                 return baseUrl + encodedFormulas.join("&");

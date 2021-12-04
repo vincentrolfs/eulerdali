@@ -18,11 +18,15 @@ export class Painter {
 
     try {
       painting = this.createPainting(paintInputs);
-    } catch (e) {}
+    } catch (e) {
+      return false;
+    }
 
     if (painting) {
       painting.apply();
     }
+
+    return true;
   }
 
   private paintAllPixel(

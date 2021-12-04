@@ -97,16 +97,19 @@ export class InputHandler {
 
   private paint() {
     let paintInputs;
+    let success = true;
 
     try {
       paintInputs = this.buildPaintInputs();
     } catch (e) {
-      console.error(e);
+      success = false;
     }
 
     if (paintInputs) {
-      this.painter.paint(paintInputs);
+      success = success && this.painter.paint(paintInputs);
     }
+
+    this.setSuccessState(success);
   }
 
   private buildPaintInputs(): PaintInputs {
@@ -116,5 +119,12 @@ export class InputHandler {
       blue: InputHandler.buildColorFunc(this.inputs.blue.value),
       zoom: InputHandler.buildZoomFunc(this.inputs.zoom.value),
     };
+  }
+
+  private setSuccessState(success: boolean) {
+    for (const key of PaintInputNames) {
+      const classes = this.inputs[key].classList;
+      success ? classes.remove("error") : classes.add("error");
+    }
   }
 }

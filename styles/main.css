@@ -41,6 +41,7 @@ a:hover {
 #toolbar.closed {
     width: unset;
     height: unset;
+    border-radius: 8pt 0 0 0;
 }
 
 #toolbar.closed #toolbar-caption, #toolbar.closed #button-close, #toolbar.closed #toolbar-inputs, #toolbar.closed #toolbar-buttons {
@@ -108,6 +109,11 @@ a:hover {
 
 #toolbar-inputs input {
     margin-bottom: 5pt;
+}
+
+#toolbar-inputs input.error {
+    background: black;
+    color: red;
 }
 
 #toolbar-inputs .action {
