@@ -9,6 +9,17 @@
         Object.defineProperty(exports, "__cjsModule", { value: true });
         Object.defineProperty(exports, "default", { value: function (name) { return resolve(name); } });
     });
+    var __assign = (this && this.__assign) || function () {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                    t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
     define("Canvas", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
@@ -285,10 +296,10 @@
                     });
                 });
             };
-            InputHandler.prototype.overwrite = function (values) {
+            InputHandler.prototype.overwrite = function (formulas) {
                 for (var _i = 0, PaintInputNames_1 = utilities_1.PaintInputNames; _i < PaintInputNames_1.length; _i++) {
                     var key = PaintInputNames_1[_i];
-                    this.inputs[key].value = values[key];
+                    this.inputs[key].value = formulas[key];
                 }
                 this.paint();
             };
@@ -316,7 +327,20 @@
                 return new Function("t", "return " + funcDescription + ";");
             };
             InputHandler.prototype.setInitial = function () {
-                this.overwrite(examples_1.examples[examples_1.initialExample]);
+                var params = new URLSearchParams(window.location.search);
+                var example = examples_1.examples[examples_1.initialExample];
+                var formulas = __assign({}, example);
+                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
+                    var key = PaintInputNames_2[_i];
+                    var formula = params.get(key);
+                    if (formula !== null) {
+                        formulas[key] = formula;
+                    }
+                    else {
+                        return this.overwrite(example);
+                    }
+                }
+                this.overwrite(formulas);
             };
             InputHandler.prototype.onInputChange = function (el) {
                 var _this = this;
@@ -353,8 +377,8 @@
                 };
             };
             InputHandler.prototype.setSuccessState = function (success) {
-                for (var _i = 0, PaintInputNames_2 = utilities_1.PaintInputNames; _i < PaintInputNames_2.length; _i++) {
-                    var key = PaintInputNames_2[_i];
+                for (var _i = 0, PaintInputNames_3 = utilities_1.PaintInputNames; _i < PaintInputNames_3.length; _i++) {
+                    var key = PaintInputNames_3[_i];
                     var classes = this.inputs[key].classList;
                     success ? classes.remove("error") : classes.add("error");
                 }
@@ -584,8 +608,8 @@
                 var baseUrl = location.protocol + "//" + location.host + location.pathname + "?";
                 var formulas = this.inputHandler.getFormulas();
                 var encodedFormulas = [];
-                for (var _i = 0, PaintInputNames_3 = utilities_2.PaintInputNames; _i < PaintInputNames_3.length; _i++) {
-                    var key = PaintInputNames_3[_i];
+                for (var _i = 0, PaintInputNames_4 = utilities_2.PaintInputNames; _i < PaintInputNames_4.length; _i++) {
+                    var key = PaintInputNames_4[_i];
                     encodedFormulas.push(key + "=" + encodeURIComponent(formulas[key]));
                 }
                 return baseUrl + encodedFormulas.join("&");

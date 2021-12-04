@@ -41,9 +41,9 @@ export class InputHandler {
     );
   }
 
-  overwrite(values: Record<PaintInputName, string>) {
+  overwrite(formulas: Record<PaintInputName, string>) {
     for (const key of PaintInputNames) {
-      this.inputs[key].value = values[key];
+      this.inputs[key].value = formulas[key];
     }
 
     this.paint();
@@ -81,7 +81,21 @@ export class InputHandler {
   }
 
   private setInitial() {
-    this.overwrite(examples[initialExample]);
+    const params = new URLSearchParams(window.location.search);
+    const example = examples[initialExample];
+    const formulas: Record<PaintInputName, string> = { ...example };
+
+    for (const key of PaintInputNames) {
+      const formula = params.get(key);
+
+      if (formula !== null) {
+        formulas[key] = formula;
+      } else {
+        return this.overwrite(example);
+      }
+    }
+
+    this.overwrite(formulas);
   }
 
   private onInputChange(el: HTMLInputElement | null) {
