@@ -1,12 +1,12 @@
-import { Painter } from "./Painter";
+import { Painter } from "../Painter";
 import {
   ColorFunc,
   PaintInputName,
   PaintInputNames,
   PaintInputs,
   ZoomFunc,
-} from "./common/utilities";
-import { DEBOUNCE_TIMEOUT } from "./common/constants";
+} from "../common/utilities";
+import { DEBOUNCE_TIMEOUT } from "../common/constants";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
@@ -30,6 +30,27 @@ export class Parser {
     Parser.registerGlobalMath();
   }
 
+  activate() {
+    this.setEventListeners();
+  }
+
+  overwrite(values: Record<PaintInputName, string>) {
+    for (const key of PaintInputNames) {
+      this.inputs[key].value = values[key];
+    }
+
+    this.paint();
+  }
+
+  getFormulas(): Record<PaintInputName, string> {
+    return {
+      red: this.inputs.red.value,
+      green: this.inputs.green.value,
+      blue: this.inputs.blue.value,
+      zoom: this.inputs.zoom.value,
+    };
+  }
+
   private static registerGlobalMath() {
     for (const key of Object.getOwnPropertyNames(Math)) {
       if (Math.hasOwnProperty(key) && !window.hasOwnProperty(key)) {
@@ -50,27 +71,6 @@ export class Parser {
 
   private static buildZoomFunc(funcDescription: string): ZoomFunc {
     return new Function("t", `return ${funcDescription};`) as ZoomFunc;
-  }
-
-  overwrite(values: Record<PaintInputName, string>) {
-    for (const key of PaintInputNames) {
-      this.inputs[key].value = values[key];
-    }
-
-    this.paint();
-  }
-
-  activate() {
-    this.setEventListeners();
-  }
-
-  getValues(): Record<PaintInputName, string> {
-    return {
-      red: this.inputs.red.value,
-      green: this.inputs.green.value,
-      blue: this.inputs.blue.value,
-      zoom: this.inputs.zoom.value,
-    };
   }
 
   private setEventListeners() {
