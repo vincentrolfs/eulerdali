@@ -1,7 +1,4 @@
-import {
-  RANDOMIZER_MAX_DEPTH,
-  RANDOMIZER_MIN_DEPTH,
-} from "../common/constants";
+import { RANDOMIZER_MAX_DEPTH, RANDOMIZER_MIN_DEPTH } from "../common/settings";
 
 type NullaryOperation = (n: number) => string;
 type UnaryOperation = (s: string) => string;

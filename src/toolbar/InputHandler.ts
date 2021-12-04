@@ -6,7 +6,7 @@ import {
   PaintInputs,
   ZoomFunc,
 } from "../common/utilities";
-import { DEBOUNCE_TIMEOUT } from "../common/constants";
+import { DEBOUNCE_TIMEOUT } from "../common/settings";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";

@@ -1,14 +1,20 @@
 import { InputHandler } from "./InputHandler";
-import { EXAMPLES_ID } from "../common/constants";
 import { examples, initialExample } from "./examples";
 import { Randomizer } from "./Randomizer";
 import { PaintInputNames } from "../common/utilities";
 import { Painter } from "../Painter";
 import { Animator } from "./Animator";
 
+const TOOLBAR_ID = "toolbar";
+const EXAMPLES_ID = "examples";
+
 const BUTTON_ID_RANDOM = "button-random";
 const BUTTON_ID_HELP = "button-help";
 const BUTTON_ID_SHARE = "button-share";
+const BUTTON_ID_CLOSE_TOOLBAR = "button-close";
+const BUTTON_ID_OPEN_TOOLBAR = "button-open";
+
+const TOOLBAR_CLOSED_CLASS = "closed";
 
 const HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
 
@@ -64,6 +70,19 @@ export class Toolbar {
     document
       .getElementById(BUTTON_ID_HELP)!
       .addEventListener("click", () => window.open(HELP_URL, "_blank"));
+
+    document
+      .getElementById(BUTTON_ID_CLOSE_TOOLBAR)!
+      .addEventListener("click", () =>
+        document.getElementById(TOOLBAR_ID)!.classList.add(TOOLBAR_CLOSED_CLASS)
+      );
+    document
+      .getElementById(BUTTON_ID_OPEN_TOOLBAR)!
+      .addEventListener("click", () =>
+        document
+          .getElementById(TOOLBAR_ID)!
+          .classList.remove(TOOLBAR_CLOSED_CLASS)
+      );
   }
 
   private setExample(exampleNumber: number) {

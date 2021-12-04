@@ -32,14 +32,44 @@ a:hover {
     margin: 0;
 
     position: absolute;
+    right: 0;
     bottom: 0;
 
     background: rgba(0, 0, 0, 0.5);
 }
 
+#toolbar.closed {
+    width: unset;
+    height: unset;
+}
+
+#toolbar.closed #toolbar-caption, #toolbar.closed #button-close, #toolbar.closed #toolbar-inputs, #toolbar.closed #toolbar-buttons {
+    display: none;
+}
+
+#toolbar.closed #button-open {
+    display: block;
+}
+
 #toolbar-caption {
     text-align: center;
     margin: 5pt 0;
+}
+
+#button-close, #button-open {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#button-close {
+    position: absolute;
+    top: 5pt;
+    right: 10pt;
+}
+
+#button-open {
+    display: none;
+    padding: 5pt 10pt;
 }
 
 #toolbar-inputs, #toolbar-buttons {

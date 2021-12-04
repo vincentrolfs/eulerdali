@@ -9,23 +9,14 @@
         Object.defineProperty(exports, "__cjsModule", { value: true });
         Object.defineProperty(exports, "default", { value: function (name) { return resolve(name); } });
     });
-    define("common/constants", ["require", "exports"], function (require, exports) {
-        "use strict";
-        Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = exports.EXAMPLES_ID = exports.CANVAS_ID = void 0;
-        exports.CANVAS_ID = "canvas";
-        exports.EXAMPLES_ID = "examples";
-        exports.DEBOUNCE_TIMEOUT = 300;
-        exports.RANDOMIZER_MIN_DEPTH = 1;
-        exports.RANDOMIZER_MAX_DEPTH = 6;
-    });
-    define("Canvas", ["require", "exports", "common/constants"], function (require, exports, constants_1) {
+    define("Canvas", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Canvas = void 0;
+        var CANVAS_ID = "canvas";
         var Canvas = /** @class */ (function () {
             function Canvas() {
-                this.element = document.getElementById(constants_1.CANVAS_ID);
+                this.element = document.getElementById(CANVAS_ID);
                 this.element.width = document.body.clientWidth;
                 this.element.height = document.body.clientHeight;
                 this.ctx = this.element.getContext("2d");
@@ -149,7 +140,15 @@
         }());
         exports.Painter = Painter;
     });
-    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/constants"], function (require, exports, utilities_1, constants_2) {
+    define("common/settings", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = void 0;
+        exports.DEBOUNCE_TIMEOUT = 300;
+        exports.RANDOMIZER_MIN_DEPTH = 1;
+        exports.RANDOMIZER_MAX_DEPTH = 6;
+    });
+    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/settings"], function (require, exports, utilities_1, settings_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.InputHandler = void 0;
@@ -219,7 +218,7 @@
                         return;
                     }
                     _this.paint();
-                }, constants_2.DEBOUNCE_TIMEOUT);
+                }, settings_1.DEBOUNCE_TIMEOUT);
             };
             InputHandler.prototype.paint = function () {
                 var paintInputs;
@@ -351,7 +350,7 @@
             },
         ];
     });
-    define("toolbar/Randomizer", ["require", "exports", "common/constants"], function (require, exports, constants_3) {
+    define("toolbar/Randomizer", ["require", "exports", "common/settings"], function (require, exports, settings_2) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Randomizer = void 0;
@@ -396,7 +395,7 @@
             function Randomizer() {
             }
             Randomizer.prototype.randomFunc = function () {
-                var targetDepth = this.randInt(constants_3.RANDOMIZER_MIN_DEPTH, constants_3.RANDOMIZER_MAX_DEPTH);
+                var targetDepth = this.randInt(settings_2.RANDOMIZER_MIN_DEPTH, settings_2.RANDOMIZER_MAX_DEPTH);
                 return this.createSubFunc(1, targetDepth);
             };
             Randomizer.prototype.randomZoom = function () {
@@ -483,13 +482,18 @@
         }());
         exports.Animator = Animator;
     });
-    define("toolbar/Toolbar", ["require", "exports", "toolbar/InputHandler", "common/constants", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, InputHandler_1, constants_4, examples_1, Randomizer_1, utilities_2, Animator_1) {
+    define("toolbar/Toolbar", ["require", "exports", "toolbar/InputHandler", "toolbar/examples", "toolbar/Randomizer", "common/utilities", "toolbar/Animator"], function (require, exports, InputHandler_1, examples_1, Randomizer_1, utilities_2, Animator_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Toolbar = void 0;
+        var TOOLBAR_ID = "toolbar";
+        var EXAMPLES_ID = "examples";
         var BUTTON_ID_RANDOM = "button-random";
         var BUTTON_ID_HELP = "button-help";
         var BUTTON_ID_SHARE = "button-share";
+        var BUTTON_ID_CLOSE_TOOLBAR = "button-close";
+        var BUTTON_ID_OPEN_TOOLBAR = "button-open";
+        var TOOLBAR_CLOSED_CLASS = "closed";
         var HELP_URL = "https://github.com/vincentrolfs/eulerdali#readme";
         var Toolbar = /** @class */ (function () {
             function Toolbar(painter) {
@@ -505,14 +509,14 @@
                 this.setExample(examples_1.initialExample);
             };
             Toolbar.prototype.showExampleOptions = function () {
-                document.getElementById(constants_4.EXAMPLES_ID).innerHTML += examples_1.examples
+                document.getElementById(EXAMPLES_ID).innerHTML += examples_1.examples
                     .map(function (example, index) { return "<option value=\"" + index + "\">" + example.name + "</option>"; })
                     .join(", ");
             };
             Toolbar.prototype.setEventListeners = function () {
                 var _this = this;
                 document
-                    .getElementById(constants_4.EXAMPLES_ID)
+                    .getElementById(EXAMPLES_ID)
                     .addEventListener("change", function (event) {
                     var target = event.target;
                     var value = target === null || target === void 0 ? void 0 : target.value;
@@ -531,6 +535,18 @@
                 document
                     .getElementById(BUTTON_ID_HELP)
                     .addEventListener("click", function () { return window.open(HELP_URL, "_blank"); });
+                document
+                    .getElementById(BUTTON_ID_CLOSE_TOOLBAR)
+                    .addEventListener("click", function () {
+                    return document.getElementById(TOOLBAR_ID).classList.add(TOOLBAR_CLOSED_CLASS);
+                });
+                document
+                    .getElementById(BUTTON_ID_OPEN_TOOLBAR)
+                    .addEventListener("click", function () {
+                    return document
+                        .getElementById(TOOLBAR_ID)
+                        .classList.remove(TOOLBAR_CLOSED_CLASS);
+                });
             };
             Toolbar.prototype.setExample = function (exampleNumber) {
                 this.inputHandler.overwrite(examples_1.examples[exampleNumber]);
