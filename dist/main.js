@@ -20,18 +20,49 @@
         };
         return __assign.apply(this, arguments);
     };
-    define("Canvas", ["require", "exports"], function (require, exports) {
+    define("common/settings", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = void 0;
+        exports.DEBOUNCE_TIMEOUT = 300;
+        exports.RANDOMIZER_MIN_DEPTH = 1;
+        exports.RANDOMIZER_MAX_DEPTH = 6;
+    });
+    define("common/Debouncer", ["require", "exports", "common/settings"], function (require, exports, settings_1) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.Debouncer = void 0;
+        var Debouncer = /** @class */ (function () {
+            function Debouncer() {
+            }
+            Debouncer.prototype.fire = function (handler) {
+                if (this.inputTimeout !== undefined) {
+                    clearTimeout(this.inputTimeout);
+                }
+                this.inputTimeout = setTimeout(handler, settings_1.DEBOUNCE_TIMEOUT);
+            };
+            return Debouncer;
+        }());
+        exports.Debouncer = Debouncer;
+    });
+    define("Canvas", ["require", "exports", "common/Debouncer"], function (require, exports, Debouncer_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.Canvas = void 0;
         var CANVAS_ID = "canvas";
         var Canvas = /** @class */ (function () {
             function Canvas() {
+                var _this = this;
                 this.element = document.getElementById(CANVAS_ID);
-                this.element.width = document.body.clientWidth;
-                this.element.height = document.body.clientHeight;
-                this.ctx = this.element.getContext("2d");
-                this.ctx.fillRect(0, 0, this.element.width, this.element.height);
+                this.ctx = this.initialize();
+                this.debouncer = new Debouncer_1.Debouncer();
+                window.addEventListener("resize", function () {
+                    return _this.debouncer.fire(function () {
+                        _this.element.width = _this.element.height = 0;
+                        _this.initialize();
+                        _this.onResize && _this.onResize();
+                    });
+                });
             }
             Object.defineProperty(Canvas.prototype, "width", {
                 get: function () {
@@ -49,6 +80,17 @@
             });
             Canvas.prototype.putImageData = function (imageData) {
                 this.ctx.putImageData(imageData, 0, 0);
+            };
+            Canvas.prototype.registerOnResize = function (onResize) {
+                this.onResize = onResize;
+                return onResize();
+            };
+            Canvas.prototype.initialize = function () {
+                this.element.width = document.body.clientWidth;
+                this.element.height = document.body.clientHeight;
+                this.ctx = this.element.getContext("2d");
+                this.ctx.fillRect(0, 0, this.element.width, this.element.height);
+                return this.ctx;
             };
             return Canvas;
         }());
@@ -103,17 +145,20 @@
                 return painting;
             };
             Painter.prototype.paint = function (paintInputs) {
-                var painting;
-                try {
-                    painting = this.createPainting(paintInputs);
-                }
-                catch (e) {
-                    return false;
-                }
-                if (painting) {
-                    painting.apply();
-                }
-                return true;
+                var _this = this;
+                return this.canvas.registerOnResize(function () {
+                    var painting;
+                    try {
+                        painting = _this.createPainting(paintInputs);
+                    }
+                    catch (e) {
+                        return false;
+                    }
+                    if (painting) {
+                        painting.apply();
+                    }
+                    return true;
+                });
             };
             Painter.prototype.paintAllPixel = function (painting, paintInputs, t) {
                 var _a = this.canvas, width = _a.width, height = _a.height;
@@ -154,14 +199,6 @@
         }());
         exports.Painter = Painter;
     });
-    define("common/settings", ["require", "exports"], function (require, exports) {
-        "use strict";
-        Object.defineProperty(exports, "__esModule", { value: true });
-        exports.RANDOMIZER_MAX_DEPTH = exports.RANDOMIZER_MIN_DEPTH = exports.DEBOUNCE_TIMEOUT = void 0;
-        exports.DEBOUNCE_TIMEOUT = 300;
-        exports.RANDOMIZER_MIN_DEPTH = 1;
-        exports.RANDOMIZER_MAX_DEPTH = 6;
-    });
     define("toolbar/examples", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
@@ -177,9 +214,9 @@
             },
             {
                 name: "Simple example",
-                red: "x",
-                green: "y",
-                blue: "x+y",
+                red: "x+y",
+                green: "x",
+                blue: "y",
                 zoom: "1",
             },
             {
@@ -268,7 +305,7 @@
             },
         ];
     });
-    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "common/settings", "toolbar/examples"], function (require, exports, utilities_1, settings_1, examples_1) {
+    define("toolbar/InputHandler", ["require", "exports", "common/utilities", "toolbar/examples", "common/Debouncer"], function (require, exports, utilities_1, examples_1, Debouncer_2) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.InputHandler = void 0;
@@ -285,6 +322,7 @@
                     blue: document.querySelector(INPUT_ID_BLUE),
                     zoom: document.querySelector(INPUT_ID_ZOOM),
                 };
+                this.debouncer = new Debouncer_2.Debouncer();
                 InputHandler.registerGlobalMath();
                 this.setInitial();
             }
@@ -344,15 +382,12 @@
             };
             InputHandler.prototype.onInputChange = function (el) {
                 var _this = this;
-                if (this.inputTimeout !== undefined) {
-                    clearTimeout(this.inputTimeout);
-                }
-                this.inputTimeout = setTimeout(function () {
+                this.debouncer.fire(function () {
                     if (!el || !el.id || !el.value) {
                         return;
                     }
                     _this.paint();
-                }, settings_1.DEBOUNCE_TIMEOUT);
+                });
             };
             InputHandler.prototype.paint = function () {
                 var paintInputs;

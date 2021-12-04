@@ -14,19 +14,21 @@ export class Painter {
   }
 
   paint(paintInputs: PaintInputs) {
-    let painting;
+    return this.canvas.registerOnResize(() => {
+      let painting;
 
-    try {
-      painting = this.createPainting(paintInputs);
-    } catch (e) {
-      return false;
-    }
+      try {
+        painting = this.createPainting(paintInputs);
+      } catch (e) {
+        return false;
+      }
 
-    if (painting) {
-      painting.apply();
-    }
+      if (painting) {
+        painting.apply();
+      }
 
-    return true;
+      return true;
+    });
   }
 
   private paintAllPixel(

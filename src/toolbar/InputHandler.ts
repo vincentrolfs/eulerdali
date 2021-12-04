@@ -8,6 +8,7 @@ import {
 } from "../common/utilities";
 import { DEBOUNCE_TIMEOUT } from "../common/settings";
 import { examples, initialExample } from "./examples";
+import { Debouncer } from "../common/Debouncer";
 
 const INPUT_ID_RED = "#input-red";
 const INPUT_ID_GREEN = "#input-green";
@@ -18,7 +19,7 @@ type InputMap = Record<keyof PaintInputs, HTMLInputElement>;
 
 export class InputHandler {
   private readonly inputs: InputMap;
-  private inputTimeout: number | undefined;
+  private readonly debouncer: Debouncer;
 
   constructor(private readonly painter: Painter) {
     this.inputs = {
@@ -27,9 +28,9 @@ export class InputHandler {
       blue: document.querySelector(INPUT_ID_BLUE)!,
       zoom: document.querySelector(INPUT_ID_ZOOM)!,
     };
+    this.debouncer = new Debouncer();
 
     InputHandler.registerGlobalMath();
-
     this.setInitial();
   }
 
@@ -99,17 +100,13 @@ export class InputHandler {
   }
 
   private onInputChange(el: HTMLInputElement | null) {
-    if (this.inputTimeout !== undefined) {
-      clearTimeout(this.inputTimeout);
-    }
-
-    this.inputTimeout = setTimeout(() => {
+    this.debouncer.fire(() => {
       if (!el || !el.id || !el.value) {
         return;
       }
 
       this.paint();
-    }, DEBOUNCE_TIMEOUT);
+    });
   }
 
   private paint() {

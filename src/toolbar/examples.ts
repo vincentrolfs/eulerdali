@@ -11,9 +11,9 @@ export const examples: Record<PaintInputName | "name", string>[] = [
   },
   {
     name: "Simple example",
-    red: "x",
-    green: "y",
-    blue: "x+y",
+    red: "x+y",
+    green: "x",
+    blue: "y",
     zoom: "1",
   },
   {
